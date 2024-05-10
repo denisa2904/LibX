@@ -1,19 +1,10 @@
-import psycopg2
+from connection.connect_db import connect_to_db
 
-# Database connection parameters
-DB_CONNECTION = "dbname='libx' user='postgres' host='localhost' password='admin'"
-
-
-def connect_to_db(conn_str):
-    """Establishes a connection to the PostgreSQL database."""
-    conn = psycopg2.connect(conn_str)
-    conn.autocommit = True
-    return conn
 
 
 def fetch_books_by_genre(genre_name):
     """Fetches all books that are associated with a specific genre."""
-    conn = connect_to_db(DB_CONNECTION)
+    conn = connect_to_db()
     with conn.cursor() as cur:
         cur.execute("""
             SELECT b.id, b.title, b.author, b.year
@@ -28,7 +19,7 @@ def fetch_books_by_genre(genre_name):
 
 
 def main():
-    conn = connect_to_db(DB_CONNECTION)
+    conn = connect_to_db()
     with conn.cursor() as cur:
         cur.execute("SELECT genre FROM genres")
         genres = [row[0] for row in cur.fetchall()]

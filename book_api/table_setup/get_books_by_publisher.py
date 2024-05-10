@@ -1,19 +1,9 @@
-import psycopg2
-
-# Database connection parameters
-DB_CONNECTION = "dbname='libx' user='postgres' host='localhost' password='admin'"
-
-
-def connect_to_db(conn_str):
-    """Establishes a connection to the PostgreSQL database."""
-    conn = psycopg2.connect(conn_str)
-    conn.autocommit = True
-    return conn
+from connection.connect_db import connect_to_db
 
 
 def fetch_books_by_publisher(publisher_name):
     """Fetches all books that are published by a specific publisher."""
-    conn = connect_to_db(DB_CONNECTION)
+    conn = connect_to_db()
     with conn.cursor() as cur:
         cur.execute("""
             SELECT id, title, author, year, description
@@ -26,7 +16,7 @@ def fetch_books_by_publisher(publisher_name):
 
 
 def main():
-    conn = connect_to_db(DB_CONNECTION)
+    conn = connect_to_db()
     with conn.cursor() as cur:
         cur.execute("SELECT DISTINCT publisher FROM book")
         publishers = [row[0] for row in cur.fetchall()]

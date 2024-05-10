@@ -1,8 +1,7 @@
-import psycopg2
 import requests
 import uuid
+from connection.connect_db import connect_to_db
 
-DB_CONNECTION = "dbname='libx' user='postgres' host='localhost' password='admin'"
 URL = "https://www.googleapis.com/books/v1/volumes/"
 
 
@@ -11,14 +10,8 @@ def fetch_data(api_id):
     return response.json()
 
 
-def connect_to_db(conn_str):
-    conn = psycopg2.connect(conn_str)
-    conn.autocommit = True
-    return conn
-
-
 def create_tables():
-    conn = connect_to_db(DB_CONNECTION)
+    conn = connect_to_db()
     with conn.cursor() as cur:
         # Create genres table
         cur.execute("""
@@ -41,7 +34,7 @@ def create_tables():
 
 
 def fetch_book_ids():
-    conn = connect_to_db(DB_CONNECTION)
+    conn = connect_to_db()
     with conn.cursor() as cur:
         cur.execute("SELECT google_id, id FROM book")
         books = cur.fetchall()
@@ -67,7 +60,7 @@ def link_book_to_genre(conn, book_id, genre_id):
 
 def process_genres():
     books = fetch_book_ids()
-    conn = connect_to_db(DB_CONNECTION)
+    conn = connect_to_db()
     genre_ids = {}
     for google_id, book_id in books:
         data = fetch_data(google_id)

@@ -2,21 +2,15 @@ import requests
 import uuid
 import psycopg2
 from psycopg2 import sql
+from connection.connect_db import connect_to_db
 
 # Constants
 API_URL = "https://www.googleapis.com/books/v1/volumes?q=inauthor:Roald+Dahl"
-DB_CONNECTION_STRING = "dbname='libx' user='postgres' password='admin'"
 
 
 def fetch_data(url):
     response = requests.get(url)
     return response.json()
-
-
-def connect_to_db(conn_str):
-    conn = psycopg2.connect(conn_str)
-    conn.autocommit = True
-    return conn
 
 
 def setup_database(conn):
@@ -58,7 +52,9 @@ def insert_books_data(conn, books):
                 volume_info.get('publishedDate', 'N/A')[:4],
                 volume_info.get('description', 'No description available')
             )
-            if image != 'None' and book_tuple[4] != 'N/A' and book_tuple[7] != 'No description available' and authors != 'Unknown' and book_tuple[5] != 'N/A' and book_tuple[6] != 'N/A':
+            if image != 'None' and book_tuple[4] != 'N/A' and book_tuple[
+                7] != 'No description available' and authors != 'Unknown' and book_tuple[5] != 'N/A' and book_tuple[
+                6] != 'N/A':
                 cur.execute(query, book_tuple)
 
 
@@ -67,7 +63,7 @@ def main():
 
     if 'items' in data:
         # Connect to DB
-        conn = connect_to_db(DB_CONNECTION_STRING)
+        conn = connect_to_db()
 
         # Setup DB
         # setup_database(conn)

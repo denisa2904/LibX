@@ -1,15 +1,4 @@
-import psycopg2
-
-
-# Database connection parameters
-DB_CONNECTION = "dbname='libx' user='postgres' host='localhost' password='admin'"
-
-
-def connect_to_db(conn_str):
-    """Establishes a connection to the PostgreSQL database."""
-    conn = psycopg2.connect(conn_str)
-    conn.autocommit = True
-    return conn
+from connection.connect_db import connect_to_db
 
 
 def setup_database(conn):
@@ -32,7 +21,7 @@ def setup_database(conn):
 
 
 def main():
-    conn = connect_to_db(DB_CONNECTION)
+    conn = connect_to_db()
     setup_database(conn)
     conn.close()
     print("Comments database setup complete.")
