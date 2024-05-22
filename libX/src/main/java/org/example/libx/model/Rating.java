@@ -26,7 +26,7 @@ public class Rating {
 
     @Setter
     @Getter
-    @Column(name = "value", nullable = false)
+    @Column(name = "rating", nullable = false)
     private int value;
 
     @Setter

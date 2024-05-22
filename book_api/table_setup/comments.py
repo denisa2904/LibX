@@ -10,6 +10,7 @@ def setup_database(conn):
                 book_id UUID NOT NULL,
                 user_id UUID NOT NULL,
                 comment TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 FOREIGN KEY (book_id) REFERENCES book(id),
                 FOREIGN KEY (user_id) REFERENCES users(id)
             );

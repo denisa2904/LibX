@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users")
 public class User implements UserDetails{
     @Setter
     @Getter
@@ -30,20 +30,12 @@ public class User implements UserDetails{
     private UUID id;
 
     @Setter
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
-    @Setter
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
-    @Setter
     @Column(name ="username", nullable = false)
     private String username;
     @Setter
     @Column(name = "email", nullable = false)
     private String email;
-    @Column(name ="phone", nullable = false)
-    private String phone;
-    @Column(name = "password", nullable = false)
+    @Column(name = "hashed_password", nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
@@ -54,7 +46,7 @@ public class User implements UserDetails{
     @JoinTable(
             name = "favorites",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "animal_id")
+            inverseJoinColumns = @JoinColumn(name = "book_id")
     )
     private List<Book> favorites = new ArrayList<>();
 
@@ -72,11 +64,8 @@ public class User implements UserDetails{
     }
 
     public User(String firstName, String lastName, String username, String email, String phone, String password) {
-        setFirstName(firstName);
-        setLastName(lastName);
         setUsername(username);
         setEmail(email);
-        setPhone(phone);
         setPassword(password);
         setRole("USER");
     }
@@ -89,22 +78,10 @@ public class User implements UserDetails{
         this.password = password;
     }
 
-    private void setPhone(String phone) {
-        this.phone = phone;
-    }
-
     //getters
 
     public UUID getId() {
         return id;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
     }
 
     public String getUsername() {
@@ -113,10 +90,6 @@ public class User implements UserDetails{
 
     public String getEmail() {
         return email;
-    }
-
-    public String getPhone() {
-        return phone;
     }
 
     public String getPassword() {

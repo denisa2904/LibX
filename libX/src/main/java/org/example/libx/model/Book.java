@@ -3,7 +3,6 @@ package org.example.libx.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +15,10 @@ public class Book {
 
     @Id
     @Column(name = "id", updatable = false, nullable = false)
-    private String id;
+    private UUID id;
+
+    @Column(name = "google_id")
+    private String googleId;
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -26,6 +28,9 @@ public class Book {
 
     @Column(name = "isbn", nullable = false)
     private String isbn;
+
+    @Column(name = "publisher", nullable = false)
+    private String publisher;
 
     @Column(name = "year", nullable = false)
     private int year;
@@ -40,6 +45,10 @@ public class Book {
 
     @OneToOne(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
     private Image image;
+
+    @ManyToMany(mappedBy = "books", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Genre> genres;
+
     public Book(){
 
     }

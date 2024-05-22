@@ -27,7 +27,7 @@ public class Image {
             nullable = false)
     private String title;
     @Getter
-    @Column(name = "location",
+    @Column(name = "image_url",
             nullable = false,
             unique = true)
     private String location;

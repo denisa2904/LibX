@@ -2,12 +2,14 @@ package org.example.libx.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Getter
 @Entity
 @Table(name = "comments")
 public class Comment {
@@ -23,7 +25,7 @@ public class Comment {
     private UUID id;
 
     @Setter
-    @Column(name = "content", nullable = false)
+    @Column(name = "comment", nullable = false)
     private String content;
 
     @Setter
@@ -50,26 +52,6 @@ public class Comment {
         setUser(user);
         setBook(book);
         setCreatedAt(LocalDateTime.now());
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public Book getBook() {
-        return book;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
     }
 
     @Override
