@@ -63,7 +63,7 @@ public class User implements UserDetails{
     public User() {
     }
 
-    public User(String firstName, String lastName, String username, String email, String phone, String password) {
+    public User( String username, String email, String password) {
         setUsername(username);
         setEmail(email);
         setPassword(password);

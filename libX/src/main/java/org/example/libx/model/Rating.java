@@ -8,11 +8,11 @@ import org.hibernate.annotations.GenericGenerator;
 
 import java.util.UUID;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "ratings")
 public class Rating {
-    @Setter
-    @Getter
     @Id
     @GenericGenerator(
             name = "rating_sequence",
@@ -24,13 +24,9 @@ public class Rating {
     )
     private UUID id;
 
-    @Setter
-    @Getter
     @Column(name = "rating", nullable = false)
     private int value;
 
-    @Setter
-    @Getter
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
@@ -46,14 +42,6 @@ public class Rating {
         setValue(value);
         setUser(user);
         setBook(book);
-    }
-
-    public Book getBook() {
-        return book;
-    }
-
-    public void setBook(Book book) {
-        this.book = book;
     }
 
     @Override
