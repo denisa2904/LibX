@@ -1,13 +1,12 @@
 import os
+import uuid
+
 import requests
-import psycopg2
 import firebase_admin
 from firebase_admin import credentials, storage
 from google.cloud import datastore
 from requests.exceptions import RequestException
-
-# Database connection parameters
-DB_CONNECTION = "dbname='libx' user='postgres' host='localhost' password='admin'"
+from table_setup.connection.connect_db import connect_to_db
 
 # Set up Google Cloud Datastore
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'cloud_sdk/libx-bc35e-535ab2ee56a3.json'
@@ -21,18 +20,29 @@ app = firebase_admin.initialize_app(cred, {
 bucket = storage.bucket(app=app)
 
 
-def connect_db():
-    conn = psycopg2.connect(DB_CONNECTION)
-    return conn
-
-
 def fetch_book_ids():
-    conn = connect_db()
+    conn = connect_to_db()
+    book_ids = []
     with conn.cursor() as cur:
         cur.execute("SELECT google_id FROM book")
         book_ids = [row[0] for row in cur.fetchall()]
+        for google_id in book_ids:
+            img_id = str(uuid.uuid4())
+            real_id = get_id_for_book(google_id)
+            cur.execute("INSERT INTO images (id, title, book_id, type) "
+                        "VALUES (%s, %s, %s, 'image/jpeg')", (img_id, real_id, real_id))
     conn.close()
     return book_ids
+
+
+def get_id_for_book(google_id):
+    conn = connect_to_db()
+    book_id = None
+    with conn.cursor() as cur:
+        cur.execute("SELECT id FROM book WHERE google_id = %s", (google_id,))
+        book_id = cur.fetchone()[0]
+    conn.close()
+    return book_id
 
 
 def fetch_data(url):
@@ -81,15 +91,15 @@ def main():
     for book_id in book_ids:
         api_url = f"https://www.googleapis.com/books/v1/volumes/{book_id}"
         book_detail = fetch_data(api_url)
-        if book_detail and 'volumeInfo' in book_detail and 'imageLinks' in book_detail[
-            'volumeInfo'] and 'smallThumbnail' in book_detail['volumeInfo']['imageLinks']:
+        if (book_detail and 'volumeInfo' in book_detail and 'imageLinks'
+                in book_detail['volumeInfo'] and 'smallThumbnail' in book_detail['volumeInfo']['imageLinks']):
             image_url = book_detail['volumeInfo']['imageLinks']['smallThumbnail']
-            filename = f"{book_id}_smallThumbnail.jpg"
+            db_id = get_id_for_book(book_id)
+            filename = f"{db_id}.jpg"
             public_url = upload_image_to_firebase(image_url, filename)
             save_to_datastore(book_detail['volumeInfo'].get('title', 'Unknown Title'), public_url)
         else:
-            # delete the book from database
-            conn = connect_db()
+            conn = connect_to_db()
             with conn.cursor() as cur:
                 cur.execute("DELETE FROM book WHERE google_id = %s", (book_id,))
             conn.close()

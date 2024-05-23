@@ -1,5 +1,6 @@
 package org.example.libx.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,7 +28,8 @@ public class Genre {
     @Column(name = "genre", nullable = false)
     private String title;
 
-    @ManyToMany(mappedBy = "genre", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
+    @ManyToMany(mappedBy = "genres", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Book> books;
 
     public Genre() {

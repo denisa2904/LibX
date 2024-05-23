@@ -22,7 +22,6 @@ public interface BookRepo extends JpaRepository<Book, UUID>{
     List<Book> findAllByGenres(List<Genre> genres);
     List<Book> findAllByRating(float rating);
     List<Book> findAllByPublisherContaining(String publisher);
-    List<Book> findAllByYearContaining(String year);
     List<Book> findAllByDescriptionContaining(String description);
 
 

@@ -8,16 +8,12 @@ import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
 public class User implements UserDetails{
     @Setter
-    @Getter
     @Id
     @GenericGenerator(
             name = "user_sequence",
@@ -30,7 +26,7 @@ public class User implements UserDetails{
     private UUID id;
 
     @Setter
-    @Column(name ="username", nullable = false)
+    @Column(name ="username", nullable = false, unique = true)
     private String username;
     @Setter
     @Column(name = "email", nullable = false)
@@ -39,6 +35,7 @@ public class User implements UserDetails{
     private String password;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
     private Role role;
 
     @JsonIgnore
@@ -67,7 +64,7 @@ public class User implements UserDetails{
         setUsername(username);
         setEmail(email);
         setPassword(password);
-        setRole("USER");
+        setRole("ADMIN");
     }
 
     public void setRole(String role) {
@@ -114,26 +111,27 @@ public class User implements UserDetails{
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
+
+        return Collections.singletonList(new org.springframework.security.core.authority.SimpleGrantedAuthority(role.name()));
     }
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 }

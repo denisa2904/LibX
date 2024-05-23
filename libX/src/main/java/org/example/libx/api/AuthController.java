@@ -28,6 +28,7 @@ public class AuthController {
         if(!service.validateNewUser(new User(request.getUsername(),
                 request.getEmail(), request.getPassword()
         ))){
+            System.out.println(request.getUsername() + " " + request.getEmail() + " " + request.getPassword());
             return ResponseEntity.status(400).contentType(MediaType.APPLICATION_JSON)
                     .body(AuthResponse.builder().token("Invalid").build());
         }

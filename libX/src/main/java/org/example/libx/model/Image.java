@@ -1,5 +1,6 @@
 package org.example.libx.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,11 +27,6 @@ public class Image {
     @Column(name = "title",
             nullable = false)
     private String title;
-    @Getter
-    @Column(name = "image_url",
-            nullable = false,
-            unique = true)
-    private String location;
     @Setter
     @Getter
     @Column(name = "type",
@@ -38,24 +34,23 @@ public class Image {
     private String type;
 
     @OneToOne(cascade = CascadeType.ALL)
+    @JsonIgnore
     @JoinColumn(name = "book_id", referencedColumnName = "id")
     private Book book;
 
     public Image() {
     }
 
-    public Image(String title, String location, String type) {
+    public Image(String title, String type) {
         this.id = UUID.randomUUID();
         this.title = title;
-        this.location = location;
-        this.type = type;
+        this.type = "image/"+type;
     }
 
     @Override
     public String toString() {
         return "Image{" +
                 ", title='" + getTitle() + '\'' +
-                ", location='" + getLocation() + '\'' +
                 ", type='" + getType() + '\'' +
                 '}';
     }

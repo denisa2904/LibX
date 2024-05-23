@@ -78,8 +78,14 @@ public class BookService {
         books.addAll(bookRepo.findAllByTitleContaining(search));
         books.addAll(bookRepo.findAllByAuthorContaining(search));
         books.addAll(bookRepo.findAllByPublisherContaining(search));
-        books.addAll(bookRepo.findAllByYearContaining(search));
         books.addAll(bookRepo.findAllByDescriptionContaining(search));
+        // if year is a number, convert to int and search by year
+        try {
+            int year = Integer.parseInt(search);
+            books.addAll(bookRepo.findAllByYear(year));
+        } catch (NumberFormatException e) {
+            // do nothing
+        }
         return books;
     }
     public List<Book> getBooksByCriteria(Criteria criteria){
@@ -103,8 +109,9 @@ public class BookService {
                         books.addAll(bookRepo.findAllByPublisherContaining(publisher));
                 }
                 case "year" -> {
+                    int year_int = Integer.parseInt(entry.getValue().get(0));
                     for (String year : entry.getValue())
-                        books.addAll(bookRepo.findAllByYearContaining(year));
+                        books.addAll(bookRepo.findAllByYear(year_int));
                 }
                 case "genres" -> {
                     for (String genre : entry.getValue()) {

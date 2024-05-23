@@ -7,7 +7,10 @@ import org.example.libx.model.Genre;
 import org.example.libx.model.Image;
 import org.example.libx.service.BookService;
 import org.example.libx.service.ImageService;
+import org.hibernate.event.spi.SaveOrUpdateEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -85,17 +88,30 @@ public class BookController {
 
     @GetMapping("{id}/image")
     public ResponseEntity<byte[]> getImageByBookId(@PathVariable("id") UUID id) {
+        System.out.println("Fetching image for book ID: " + id);
         Optional<Image> image = imageService.getImageByBookId(id);
-        if(image.isEmpty())
-            return ResponseEntity.status(NOT_FOUND).body("Image not found.".getBytes());
-        try{
-            byte[] img = firebaseStorageStrategy.download(image.get().getLocation());
-            return ResponseEntity.
-                    status(OK).
-                    contentType(MediaType.valueOf(image.get().getType())).
-                    body(img);
+
+        if (image.isEmpty()) {
+            System.out.println("Image not found in database for book ID: " + id);
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Image not found.".getBytes());
+        }
+
+        try {
+            String imagePath = image.get().getTitle();
+            String imageType = image.get().getType();
+            System.out.println("Image path: " + imagePath);
+            System.out.println("Image type: " + imageType);
+
+            byte[] img = firebaseStorageStrategy.download(imagePath);
+            System.out.println("Image downloaded successfully, size: " + img.length + " bytes");
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(imageType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + imagePath + "\"")
+                    .body(img);
         } catch (Exception e) {
-            return ResponseEntity.status(NOT_FOUND).body("Image not found.".getBytes());
+            System.out.println("Error occurred while fetching the image: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Image not found.".getBytes());
         }
     }
 

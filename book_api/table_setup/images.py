@@ -9,7 +9,6 @@ def setup_database(conn):
                 id UUID PRIMARY KEY,
                 title TEXT NOT NULL,
                 book_id UUID NOT NULL,
-                image_url TEXT NOT NULL,
                 type TEXT NOT NULL,
                 FOREIGN KEY (book_id) REFERENCES book(id)
             );

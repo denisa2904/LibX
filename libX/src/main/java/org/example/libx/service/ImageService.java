@@ -55,15 +55,11 @@ public class ImageService {
             return 0;
         Optional<Image> oldImage = getImageByBookId(bookId);
         String oldImageLocation = "";
-        if(oldImage.isPresent()) {
-            oldImageLocation = oldImage.get().getLocation();
-            deleteImage(oldImage.get().getId());
-        }
+        oldImage.ifPresent(value -> deleteImage(value.getId()));
 
         String id = book.get().getId().toString();
-        String fileName = id + "_" + image.getOriginalFilename();
         String FileType = image.getContentType();
-        Image image1 = new Image(image.getOriginalFilename(), fileName, FileType);
+        Image image1 = new Image(id, FileType);
         if(addImage(image1, bookId) == 0)
             return 0;
         try{

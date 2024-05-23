@@ -31,12 +31,16 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request){
+        System.out.println(request.getUsername() + " " + request.getPassword());
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
+        System.out.println("Authenticated");
         User user = repo.findUserByUsername(request.getUsername()).orElseThrow();
         Map<String, Object> claims = Map.of("role", user.getRole());
+        System.out.println(user.getUsername() + " " + user.getEmail() + " " + user.getPassword() + " " + user.getRole());
         String jwt = jwtService.generateToken(claims, user);
+        System.out.println(jwt);
         return AuthResponse.builder()
                 .token(jwt)
                 .build();
