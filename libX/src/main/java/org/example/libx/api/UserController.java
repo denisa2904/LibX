@@ -28,6 +28,11 @@ public class UserController {
         this.bookService = bookService;
     }
 
+    public User getUser(HttpServletRequest request) {
+        String username = userService.getUsernameFromJwt(request);
+        return userService.getUserByUsername(username);
+    }
+
     @GetMapping
     public List<User> getUsers() {
         return userService.getAllUsers();
@@ -60,8 +65,7 @@ public class UserController {
 
     @PatchMapping(path = "/updateSelf")
     public ResponseEntity<?> updateSelf(@NonNull HttpServletRequest request, @RequestBody User user) {
-        String username = userService.getUsernameFromJwt(request);
-        User oldUser = userService.getUserByUsername(username);
+        User oldUser = getUser(request);
         if (oldUser == null)
             return ResponseEntity.status(NOT_FOUND).body("User not found");
         if (user.getEmail() != null)
@@ -73,19 +77,50 @@ public class UserController {
         return ResponseEntity.status(NO_CONTENT).body("User updated");
     }
 
+    @GetMapping(path = "/rented")
+    public ResponseEntity<?> getRentedBooks(@NonNull HttpServletRequest request) {
+        User user = getUser(request);
+        if (user == null)
+            return ResponseEntity.status(NOT_FOUND).body("User not found");
+        return ResponseEntity.status(OK).body(user.getRentedBooks());
+    }
+
+    @PostMapping(path = "/rented")
+    public ResponseEntity<?> rentBook(@NonNull HttpServletRequest request, @RequestBody BookId bookId) {
+        User user = getUser(request);
+        if (user == null)
+            return ResponseEntity.status(NOT_FOUND).body("User not found");
+
+        Optional<Book> bookMaybe = bookService.getBookById(bookId.getId());
+        if (bookMaybe.isEmpty())
+            return ResponseEntity.status(NOT_FOUND).body("Book not found");
+        Book book = bookMaybe.get();
+        if (userService.rentBook(user.getId(), book) == 0)
+            return ResponseEntity.status(NOT_ACCEPTABLE).body("Book not rented");
+        return ResponseEntity.status(CREATED).body("Book rented");
+    }
+
     @GetMapping(path = "/favorites")
     public ResponseEntity<?> getFavorites(@NonNull HttpServletRequest request) {
-        String username = userService.getUsernameFromJwt(request);
-        User user = userService.getUserByUsername(username);
+        User user = getUser(request);
         if (user == null)
             return ResponseEntity.status(NOT_FOUND).body("User not found");
         return ResponseEntity.status(OK).body(user.getFavorites());
     }
 
+    @GetMapping(path = "/recommendations")
+    public ResponseEntity<?> getRecommendations(@NonNull HttpServletRequest request) {
+        User user = getUser(request);
+        if (user == null)
+            return ResponseEntity.status(NOT_FOUND).body("User not found");
+        return ResponseEntity.status(OK).body(userService.getRecommendationsByFavorites(user.getId()));
+    }
+
+
+
     @PostMapping(path = "/favorites")
     public ResponseEntity<?> addFavorite(@NonNull HttpServletRequest request, @RequestBody BookId bookId) {
-        String username = userService.getUsernameFromJwt(request);
-        User user = userService.getUserByUsername(username);
+        User user = getUser(request);
         if (user == null)
             return ResponseEntity.status(NOT_FOUND).body("User not found");
 
@@ -100,8 +135,7 @@ public class UserController {
 
     @DeleteMapping(path = "/favorites/{bookId}")
     public ResponseEntity<?> deleteFavorite(@NonNull HttpServletRequest request, @PathVariable("bookId") UUID bookId) {
-        String username = userService.getUsernameFromJwt(request);
-        User user = userService.getUserByUsername(username);
+        User user = getUser(request);
         if (user == null)
             return ResponseEntity.status(NOT_FOUND).body("User not found");
 

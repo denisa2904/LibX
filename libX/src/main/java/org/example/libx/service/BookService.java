@@ -73,6 +73,13 @@ public class BookService {
         return bookRepo.findAllByRating(rating);
     }
 
+    public List<Book> getRecommendedBooks(UUID id) {
+        Optional<Book> book = bookRepo.findById(id);
+        if(book.isEmpty())
+            return new ArrayList<>();
+        return book.get().getRecommendations();
+    }
+
     public List<Book> getBooksBySearch(String search){
         List<Book> books = new ArrayList<>();
         books.addAll(bookRepo.findAllByTitleContaining(search));

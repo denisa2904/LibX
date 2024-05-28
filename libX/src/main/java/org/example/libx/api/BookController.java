@@ -115,6 +115,11 @@ public class BookController {
         }
     }
 
+    @GetMapping("{id}/recommendations")
+    public List<Book> getRecommendedBooks(@PathVariable("id") UUID id) {
+        return bookService.getRecommendedBooks(id);
+    }
+
     @PostMapping("criteria")
     public List<Book> getBooksByCriteria(@RequestBody Criteria criteria) {
         return bookService.getBooksByCriteria(criteria);

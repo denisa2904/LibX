@@ -5,13 +5,12 @@ import jakarta.transaction.Transactional;
 import org.example.libx.model.Book;
 import org.example.libx.model.User;
 import org.example.libx.repository.UserRepo;
+import org.example.libx.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.lang.NonNull;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Transactional
@@ -21,10 +20,13 @@ public class UserService {
 
     private final JwtService jwtService;
 
+    private final BookService bookService;
+
     @Autowired
-    public UserService(UserRepo userRepo, JwtService jwtService) {
+    public UserService(UserRepo userRepo, JwtService jwtService, BookService bookService) {
         this.userRepo = userRepo;
         this.jwtService = jwtService;
+        this.bookService = bookService;
     }
 
     public String getUsernameFromJwt(@NonNull HttpServletRequest request){
@@ -70,9 +72,26 @@ public class UserService {
         return 0;
     }
 
+    public List<Book> getUserRentedBooks(UUID userId){
+        Optional<User> user = getUserById(userId);
+        return user.map(User::getRentedBooks).orElse(null);
+    }
+
     public List<Book> getUserFavorites(UUID userId){
         Optional<User> user = getUserById(userId);
         return user.map(User::getFavorites).orElse(null);
+    }
+
+    public List<Book> getRecommendationsByFavorites(UUID userId){
+        Optional<User> user = getUserById(userId);
+        List<Book> favorites = getUserFavorites(userId);
+        // use getRecommendedBooks from BookService to make a List of Books with recommendations for every book in favorites
+        Set<Book> recommendations = new HashSet<Book>();
+        for( Book book : favorites){
+            List<Book> recommended = bookService.getRecommendedBooks(book.getId());
+            recommendations.addAll(recommended);
+        }
+        return new ArrayList<>(recommendations);
     }
 
     public int addFavorite(UUID userId, Book book){
@@ -89,6 +108,16 @@ public class UserService {
         Optional<User> user = getUserById(userId);
         if(user.isPresent()){
             user.get().getFavorites().remove(book);
+            userRepo.save(user.get());
+            return 1;
+        }
+        return 0;
+    }
+
+    public int rentBook(UUID userId, Book book){
+        Optional<User> user = getUserById(userId);
+        if(user.isPresent()){
+            user.get().getRentedBooks().add(book);
             userRepo.save(user.get());
             return 1;
         }

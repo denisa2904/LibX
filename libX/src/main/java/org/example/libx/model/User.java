@@ -13,6 +13,7 @@ import java.util.*;
 @Entity
 @Table(name = "users")
 public class User implements UserDetails{
+    @Getter
     @Setter
     @Id
     @GenericGenerator(
@@ -25,19 +26,24 @@ public class User implements UserDetails{
     )
     private UUID id;
 
+    @Getter
     @Setter
     @Column(name ="username", nullable = false, unique = true)
     private String username;
+    @Getter
     @Setter
     @Column(name = "email", nullable = false)
     private String email;
+    @Getter
     @Column(name = "hashed_password", nullable = false)
     private String password;
 
+    @Getter
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role;
 
+    @Getter
     @JsonIgnore
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
@@ -46,6 +52,16 @@ public class User implements UserDetails{
             inverseJoinColumns = @JoinColumn(name = "book_id")
     )
     private List<Book> favorites = new ArrayList<>();
+
+    @Getter
+    @JsonIgnore
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "rented_books",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "book_id")
+    )
+    private List<Book> rentedBooks = new ArrayList<>();
 
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL)
@@ -64,7 +80,7 @@ public class User implements UserDetails{
         setUsername(username);
         setEmail(email);
         setPassword(password);
-        setRole("ADMIN");
+        setRole("USER");
     }
 
     public void setRole(String role) {
@@ -75,39 +91,6 @@ public class User implements UserDetails{
         this.password = password;
     }
 
-    //getters
-
-    public UUID getId() {
-        return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public List<Book> getFavorites() {
-        return favorites;
-    }
-
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-    public List<Rating> getRatings() {
-        return ratings;
-    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
