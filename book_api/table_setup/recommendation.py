@@ -4,7 +4,6 @@ import pandas as pd
 from connection.connect_db import connect_to_db
 
 
-
 def setup_database(conn):
     """Creates the necessary tables for the recommendation module."""
     with conn.cursor() as crs:
@@ -74,9 +73,9 @@ def check_recommendation_table(conn):
 
 def main():
     conn = connect_to_db()
-    # setup_database(conn)
-    # recs = get_recommendations(conn)
-    # insert_recommendation(conn, recs)
+    setup_database(conn)
+    recs = get_recommendations(conn)
+    insert_recommendation(conn, recs)
     recs = check_recommendation_table(conn)
     conn.close()
     # print("Recommendations database setup complete.")

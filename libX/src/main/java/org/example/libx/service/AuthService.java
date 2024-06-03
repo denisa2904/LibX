@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.authentication.AuthenticationManager;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -36,11 +37,13 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
         System.out.println("Authenticated");
-        User user = repo.findUserByUsername(request.getUsername()).orElseThrow();
+        Optional<User> userOptional = repo.findUserByUsername(request.getUsername());
+        User user;
+        if(userOptional.isPresent())
+            user = userOptional.get();
+        else return null;
         Map<String, Object> claims = Map.of("role", user.getRole());
-        System.out.println(user.getUsername() + " " + user.getEmail() + " " + user.getPassword() + " " + user.getRole());
-        String jwt = jwtService.generateToken(claims, user);
-        System.out.println(jwt);
+        String jwt = jwtService.generateToken(user.getUsername());
         return AuthResponse.builder()
                 .token(jwt)
                 .build();
@@ -51,9 +54,10 @@ public class AuthService {
                 passwordEncoder.encode(request.getPassword()));
         repo.save(user);
         Map<String, Object> claims = Map.of("role", user.getRole());
-        String jwt = jwtService.generateToken(claims, user);
+        String jwt = jwtService.generateToken(user.getUsername());
         return AuthResponse.builder()
                 .token(jwt)
                 .build();
     }
+
 }

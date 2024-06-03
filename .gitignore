@@ -25,3 +25,5 @@ replay_pid*
 libX/src/main/resources/libx-bc35e-firebase-adminsdk-w56by-473ad7713a.json
 libX/src/main/resources/firebaseProps.json
 book_api/table_setup/connection/db_connection
+libX/src/main/resources/application.properties
+libX/src/main/resources/application.properties

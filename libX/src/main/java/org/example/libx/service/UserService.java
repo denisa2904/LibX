@@ -1,5 +1,6 @@
 package org.example.libx.service;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import org.example.libx.model.Book;
@@ -29,11 +30,22 @@ public class UserService {
         this.bookService = bookService;
     }
 
-    public String getUsernameFromJwt(@NonNull HttpServletRequest request){
-        String authHeader = request.getHeader("Authorization");
-        String jwt;
-        jwt = authHeader.substring(7);
-        return jwtService.extractUsername(jwt);
+    public String getUsernameFromJwt(@NonNull HttpServletRequest request) {
+        String token = null;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("authToken")) {
+                    token = cookie.getValue();
+                }
+            }
+        }
+
+        if (token != null) {
+            return jwtService.extractUsername(token);
+        }
+
+        return null;
     }
 
     public User getUserByUsername(String username) {

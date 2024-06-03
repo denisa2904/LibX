@@ -92,8 +92,8 @@ def main():
         api_url = f"https://www.googleapis.com/books/v1/volumes/{book_id}"
         book_detail = fetch_data(api_url)
         if (book_detail and 'volumeInfo' in book_detail and 'imageLinks'
-                in book_detail['volumeInfo'] and 'smallThumbnail' in book_detail['volumeInfo']['imageLinks']):
-            image_url = book_detail['volumeInfo']['imageLinks']['smallThumbnail']
+                in book_detail['volumeInfo'] and 'large' in book_detail['volumeInfo']['imageLinks']):
+            image_url = book_detail['volumeInfo']['imageLinks']['large']
             db_id = get_id_for_book(book_id)
             filename = f"{db_id}.jpg"
             public_url = upload_image_to_firebase(image_url, filename)
