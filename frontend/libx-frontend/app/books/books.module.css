@@ -79,3 +79,9 @@
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
   z-index: 1;
 }
+
+/* In your CSS file */
+.carouselItem {
+  flex: 0 0 calc(33.33% - 1rem); /* Adjust the width as needed */
+  margin-right: 1rem; /* Add some spacing between items */
+}

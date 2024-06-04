@@ -3,11 +3,9 @@ package org.example.libx.api;
 import org.example.libx.firebase.FirebaseStorageStrategy;
 import org.example.libx.model.Book;
 import org.example.libx.model.Criteria;
-import org.example.libx.model.Genre;
 import org.example.libx.model.Image;
 import org.example.libx.service.BookService;
 import org.example.libx.service.ImageService;
-import org.hibernate.event.spi.SaveOrUpdateEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,8 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.Optional;
@@ -136,6 +132,11 @@ public class BookController {
     public ResponseEntity<?> deleteBook(@PathVariable("id") UUID id) {
         if(bookService.deleteBook(id) == 1)
             return ResponseEntity.status(NO_CONTENT).body("Book deleted successfully.".getBytes());
+        System.out.println();
+        System.out.println();
+        System.out.println("Book not found.");
+        System.out.println();
+        System.out.println();
         return ResponseEntity.status(NOT_FOUND).body("Book not found.".getBytes());
     }
 

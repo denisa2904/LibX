@@ -12,7 +12,6 @@ import java.util.UUID;
 public interface BookRepo extends JpaRepository<Book, UUID>{
 
     Optional<Book> findBookByTitle(String title);
-
     List<Book> findAllByAuthor(String author);
     List<Book> findAllByPublisher(String publisher);
     List<Book> findAllByYear(int year);
@@ -23,7 +22,5 @@ public interface BookRepo extends JpaRepository<Book, UUID>{
     List<Book> findAllByRating(float rating);
     List<Book> findAllByPublisherContaining(String publisher);
     List<Book> findAllByDescriptionContaining(String description);
-
-
 
 }

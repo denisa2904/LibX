@@ -34,10 +34,13 @@ public class SecurityConfig {
                     auth.requestMatchers("/api/auth/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/books").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/books/**").permitAll();
-                    auth.requestMatchers(HttpMethod.POST, "/api/books").hasAuthority("ADMIN");
-                    auth.requestMatchers(HttpMethod.PUT, "/api/books/**").hasAuthority("ADMIN");
-                    auth.requestMatchers(HttpMethod.DELETE, "/api/books/**").hasAuthority("ADMIN");
-                    auth.requestMatchers(HttpMethod.GET, "/api/users").hasAuthority("ADMIN");
+                    auth.requestMatchers(HttpMethod.POST, "/api/users/favorites").permitAll();
+                    auth.requestMatchers(HttpMethod.GET, "/api/users/favorites").permitAll();
+                    auth.requestMatchers(HttpMethod.GET, "/api/users/favorites/**").permitAll();
+                    auth.requestMatchers(HttpMethod.DELETE, "/api/users/favorites/**").permitAll();
+                    auth.requestMatchers(HttpMethod.POST, "/api/books").permitAll();
+                    auth.requestMatchers(HttpMethod.PUT, "/api/books/**").permitAll();
+                    auth.requestMatchers(HttpMethod.DELETE, "/api/books/**").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

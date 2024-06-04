@@ -28,6 +28,7 @@ def create_tables():
                 PRIMARY KEY (book_id, genre_id),
                 FOREIGN KEY (book_id) REFERENCES book (id),
                 FOREIGN KEY (genre_id) REFERENCES genres (id)
+                ON DELETE NO ACTION
             );
         """)
     conn.close()
@@ -72,12 +73,19 @@ def process_genres():
                         genre_id = insert_genre(conn, genre)
                         genre_ids[genre] = genre_id
                     link_book_to_genre(conn, book_id, genre_ids[genre])
+        else:
+            with conn.cursor() as cur:
+                cur.execute("DELETE FROM images WHERE book_id = %s", (book_id,))
+                cur.execute("DELETE FROM book WHERE id = %s", (book_id,))
+
     conn.close()
 
 
 def main():
     create_tables()
     process_genres()
+    conn = connect_to_db()
+    conn.close()
 
 
 if __name__ == '__main__':

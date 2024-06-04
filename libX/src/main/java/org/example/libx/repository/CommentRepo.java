@@ -9,5 +9,6 @@ import java.util.UUID;
 public interface CommentRepo extends JpaRepository<Comment, UUID>{
     List<Comment> findAllByBookIdAndUserId(UUID bookId, UUID userId);
     List<Comment> findAllByBookId(UUID bookId);
+    void deleteAllByBookId(UUID bookId);
 
 }

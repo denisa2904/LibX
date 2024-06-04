@@ -32,7 +32,7 @@ export const getIndividualBook = async (bookId: string): Promise<Book> => {
         return await response.json() as Book;
     } catch (error) {
         console.error('Fetch book error:', error);
-        throw error;  // Rethrowing the error to handle it at a higher level in your application
+        throw error;  
     }
 };
 
@@ -51,6 +51,19 @@ export async function fetchImage(bookId: string): Promise<string> {
         return '';
     }
 }
+
+export async function getRecommendedBooks(bookId: string): Promise<Book[]> {
+    try {
+        const response = await fetch(`${API_URL}/${bookId}/recommendations`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch recommended books for book with ID ${bookId}: ${response.status}`);
+        }
+        return await response.json() as Book[];
+    } catch (error) {
+        console.error('Fetch recommended books error:', error);
+        throw error;
+    }
+};
 
 export default getIndividualBook;
 

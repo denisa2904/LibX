@@ -5,7 +5,7 @@ from psycopg2 import sql
 from connection.connect_db import connect_to_db
 
 # Constants
-API_URL = "https://www.googleapis.com/books/v1/volumes?q=inauthor:Roald+Dahl"
+API_URL = "https://www.googleapis.com/books/v1/volumes?q=inauthor:George+Martin"
 
 
 def fetch_data(url):

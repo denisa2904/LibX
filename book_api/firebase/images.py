@@ -101,6 +101,7 @@ def main():
         else:
             conn = connect_to_db()
             with conn.cursor() as cur:
+                cur.execute("DELETE FROM images WHERE book_id = (SELECT id FROM book WHERE google_id = %s)", (book_id,))
                 cur.execute("DELETE FROM book WHERE google_id = %s", (book_id,))
             conn.close()
 

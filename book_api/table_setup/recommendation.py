@@ -14,6 +14,7 @@ def setup_database(conn):
                 PRIMARY KEY (book_id, recommended_book_id),
                 FOREIGN KEY (book_id) REFERENCES book(id),
                 FOREIGN KEY (recommended_book_id) REFERENCES book(id)
+                ON DELETE NO ACTION 
             );
         """)
 
@@ -52,7 +53,7 @@ def get_recommendations(conn):
     cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
     recommendations = []
     for idx, row in data.iterrows():
-        similar_indices = cosine_sim[idx].argsort()[:-11:-1]
+        similar_indices = cosine_sim[idx].argsort()[:-12:-1]
         similar_books = [(data['book_id'][i], cosine_sim[idx][i]) for i in similar_indices]
         recommendations.extend([(row['book_id'], book[0]) for book in similar_books if book[0] != row['book_id']])
     return recommendations
@@ -78,7 +79,6 @@ def main():
     insert_recommendation(conn, recs)
     recs = check_recommendation_table(conn)
     conn.close()
-    # print("Recommendations database setup complete.")
     print("Recommendations:")
     for rec in recs:
         print(f"{rec[0]} -> {rec[1]}")

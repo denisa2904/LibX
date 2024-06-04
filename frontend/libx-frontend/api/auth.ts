@@ -1,12 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { jwtDecode } from 'jwt-decode';
 const API_URL = 'http://localhost:9000/api/auth';
-
-interface JwtPayload {
-    sub: string;
-    role: string;
-    exp: number;
-}
 
 export interface AuthData {
     username: string;

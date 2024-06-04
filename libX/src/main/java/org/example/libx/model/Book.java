@@ -44,10 +44,10 @@ public class Book {
     @Column(name = "rating", nullable = false)
     private float rating;
 
-    @OneToOne(mappedBy = "book", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "book", cascade = CascadeType.REMOVE)
     private Image image;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(
             name = "book_genres",
             joinColumns = @JoinColumn(name = "book_id"),
@@ -56,7 +56,7 @@ public class Book {
     private List<Genre> genres;
 
     @JsonIgnore
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     @JoinTable(
             name = "recommendations",
             joinColumns = @JoinColumn(name = "book_id"),

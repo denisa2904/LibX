@@ -108,6 +108,21 @@ public class UserController {
         return ResponseEntity.status(OK).body(user.getFavorites());
     }
 
+    @GetMapping(path = "/favorites/{bookId}")
+    public ResponseEntity<?> getFavorite(@NonNull HttpServletRequest request, @PathVariable("bookId") UUID bookId) {
+        User user = getUser(request);
+        if (user == null)
+            return ResponseEntity.status(NOT_FOUND).body("User not found");
+
+        Optional<Book> bookMaybe = bookService.getBookById(bookId);
+        if (bookMaybe.isEmpty())
+            return ResponseEntity.status(NOT_FOUND).body("Book not found");
+        Book book = bookMaybe.get();
+        if (user.getFavorites().contains(book))
+            return ResponseEntity.status(OK).body(book);
+        return ResponseEntity.status(NOT_FOUND).body("Favorite not found");
+    }
+
     @GetMapping(path = "/recommendations")
     public ResponseEntity<?> getRecommendations(@NonNull HttpServletRequest request) {
         User user = getUser(request);
@@ -119,7 +134,7 @@ public class UserController {
 
 
     @PostMapping(path = "/favorites")
-    public ResponseEntity<?> addFavorite(@NonNull HttpServletRequest request, @RequestBody BookId bookId) {
+    public ResponseEntity<?> addFavorite( HttpServletRequest request, @RequestBody BookId bookId) {
         User user = getUser(request);
         if (user == null)
             return ResponseEntity.status(NOT_FOUND).body("User not found");
@@ -130,11 +145,12 @@ public class UserController {
         Book book = bookMaybe.get();
         if (userService.addFavorite(user.getId(), book) == 0)
             return ResponseEntity.status(NOT_ACCEPTABLE).body("Favorite not added");
+        System.out.println("Favorite added");
         return ResponseEntity.status(CREATED).body("Favorite added");
     }
 
     @DeleteMapping(path = "/favorites/{bookId}")
-    public ResponseEntity<?> deleteFavorite(@NonNull HttpServletRequest request, @PathVariable("bookId") UUID bookId) {
+    public ResponseEntity<?> deleteFavorite( HttpServletRequest request, @PathVariable("bookId") UUID bookId) {
         User user = getUser(request);
         if (user == null)
             return ResponseEntity.status(NOT_FOUND).body("User not found");

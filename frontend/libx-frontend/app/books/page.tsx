@@ -9,8 +9,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
 
 
-const Meta = Card;
-
 const BooksComponent: React.FC = () => {
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -37,6 +35,7 @@ const BooksComponent: React.FC = () => {
   const onPageChange = (page: number) => {
     setCurrentPage(page);
   };
+
 
 
   if (error) return <div>Error: {error}</div>;

@@ -4,7 +4,8 @@ import jakarta.transaction.Transactional;
 import org.example.libx.model.Book;
 import org.example.libx.model.Criteria;
 import org.example.libx.model.Genre;
-import org.example.libx.repository.BookRepo;
+import org.example.libx.model.User;
+import org.example.libx.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +15,21 @@ import java.util.*;
 @Transactional
 public class BookService {
     private final BookRepo bookRepo;
+    private final CommentRepo commentRepo;
+    private final ImageRepo imageRepo;
+    private final RatingRepo ratingRepo;
+
+    private final UserRepo userRepo;
+
+
 
     @Autowired
-    public BookService(BookRepo bookRepo) {
+    public BookService(BookRepo bookRepo, CommentRepo commentRepo, ImageRepo imageRepo, RatingRepo ratingRepo, UserRepo userRepo) {
         this.bookRepo = bookRepo;
+        this.commentRepo = commentRepo;
+        this.imageRepo = imageRepo;
+        this.ratingRepo = ratingRepo;
+        this.userRepo = userRepo;
     }
 
     public boolean validateNewBook(Book book) {
@@ -156,9 +168,32 @@ public class BookService {
     }
 
     public int deleteBook(UUID id) {
-        if(bookRepo.findById(id).isEmpty())
+        try{
+            Optional<Book> book = bookRepo.findById(id);
+            if(book.isEmpty())
+                return 0;
+            List<User> users = userRepo.findAll();
+            for(User user : users){
+                user.getFavorites().remove(book.get());
+                user.getRentedBooks().remove(book.get());
+            }
+            for(Book b : book.get().getRecommendations()){
+                b.getRecommendations().remove(book.get());
+            }
+            commentRepo.deleteAllByBookId(book.get().getId());
+            imageRepo.delete(book.get().getImage());
+            ratingRepo.deleteAllByBookId(book.get().getId());
+            bookRepo.deleteById(id);
+            Optional<Book> b = bookRepo.findById(id);
+            if(b.isPresent()) {
+                System.out.println();
+                System.out.println();
+                System.out.println();
+                System.out.println("Book not deleted");
+            }
+        } catch (Exception e) {
             return 0;
-        bookRepo.deleteById(id);
+        }
         return 1;
     }
 
