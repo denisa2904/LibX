@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { fetchImage } from '@/api/get-individual-book';  // Adjust path as necessary
-
-interface BookImageProps {
-    bookId: string;
-}
+import { fetchImage } from '@/api/get-individual-book';  
+import { Skeleton } from "@/components/ui/skeleton"
 
 const BookImage: React.FC<{ bookId: string; className?: string }> = ({ bookId, className }) => {
     const [imageUrl, setImageUrl] = useState<string>('');
@@ -15,11 +12,13 @@ const BookImage: React.FC<{ bookId: string; className?: string }> = ({ bookId, c
     }, [bookId]);
 
     if (!imageUrl) {
-        return <p>Loading image...</p>;
+        return <div className="flex flex-col space-y-3">
+            <Skeleton className="h-[280px] w-[180px] rounded-xl" />
+        </div>
     }
 
     return (
-        <img src={imageUrl} alt="Book Cover" style={{ maxWidth: '10%', height: 'auto' }} />
+        <img src={imageUrl} alt="Book Cover" style={{ width: 200, height: 300 }} />
     );
 };
 

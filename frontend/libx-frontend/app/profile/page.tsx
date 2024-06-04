@@ -1,10 +1,14 @@
 'use client';
 import React from 'react';
 
+
 const Profile = () => {
     return (
-        // a button to log out 
-        <button onClick={logout}>Log out</button>
+        <div>
+            <main className="my-8">
+                <h1>Profile</h1>
+            </main>
+        </div>
     );
 };
 

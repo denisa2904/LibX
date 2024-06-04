@@ -34,7 +34,10 @@ public class AuthController {
     public ResponseEntity<String> checkAuth(@NonNull HttpServletRequest request) {
         if (userService.getUsernameFromJwt(request) != null) {
             System.out.println("User is authenticated");
-            return ResponseEntity.status(HttpStatus.OK).body("User is authenticated");
+            User user = userService.getUserByUsername(userService.getUsernameFromJwt(request));
+            String role = user.getRole();
+            System.out.println(role);
+            return ResponseEntity.status(HttpStatus.OK).body(role);
         } else {
             System.out.println("User is not authenticated");
             return ResponseEntity.status(HttpStatus.OK).body("User is not authenticated");

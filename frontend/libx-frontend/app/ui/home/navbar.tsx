@@ -9,13 +9,15 @@ export default function SideNav() {
         className="mb-2 flex h-20 items-center justify-center rounded-md bg-primary p-4 md:h-40"
         href="/"
       >
-          <div className="flex items-center cursor-pointer"> 
+          <div className="flex items-center cursor-pointer w-20 h-20 md:w-32 md:h-32">
+          <div className="relative w-full h-full">
             <Image
-                src="/logo/libx.png"
-                alt="My Bookstore Logo"
-                width={100}
-                height={100}
+              src="/logo/libx.png"
+              alt="My Bookstore Logo"
+              layout="fill"
+              objectFit="contain"
             />
+          </div>
         </div>
       </Link>
       <div className="flex grow flex-row justify-between space-x-2 md:flex-col md:space-x-0 md:space-y-2">

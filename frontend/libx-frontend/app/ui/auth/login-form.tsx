@@ -13,7 +13,6 @@ import {
 } from '@heroicons/react/24/outline';
 import { login as logUser, useAuth } from '@/api/auth';
 import { useRouter } from 'next/navigation';
-import { usePathname } from 'next/navigation';
 
 
 const schema = z.object({

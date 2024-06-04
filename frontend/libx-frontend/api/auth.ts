@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-
+import { jwtDecode } from 'jwt-decode';
 const API_URL = 'http://localhost:9000/api/auth';
+
+interface JwtPayload {
+    sub: string;
+    role: string;
+    exp: number;
+}
 
 export interface AuthData {
     username: string;
@@ -62,6 +68,7 @@ export const logout = async (): Promise<boolean> => {
 export const useAuth = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [role, setRole] = useState<string | null>(null);
 
     const verifyUser = useCallback(async () => {
         try {
@@ -69,12 +76,18 @@ export const useAuth = () => {
                 method: 'GET',
                 credentials: 'include'
             });
-            // handleResponse(response);
-            // setIsAuthenticated(response.ok);
             const text = await response.text();
-            setIsAuthenticated(text === 'User is authenticated');
+            if(text === "ADMIN" || text === "USER"){
+                setIsAuthenticated(true);
+                setRole(text);
+            }
+            else{
+                setIsAuthenticated(false);
+                setRole(null);
+            }
         } catch (error) {
             setIsAuthenticated(false);
+            setRole(null);
         } finally {
             setLoading(false);
         }
@@ -84,5 +97,7 @@ export const useAuth = () => {
         verifyUser();
     }, [verifyUser]);
 
-    return { isAuthenticated, setIsAuthenticated, loading, setLoading, verifyUser };
+    useEffect(() => {}, [role]);
+
+    return { isAuthenticated, setIsAuthenticated, loading, setLoading, verifyUser, role };
 };

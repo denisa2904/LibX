@@ -11,7 +11,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.authentication.AuthenticationManager;
 
-import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -42,8 +41,7 @@ public class AuthService {
         if(userOptional.isPresent())
             user = userOptional.get();
         else return null;
-        Map<String, Object> claims = Map.of("role", user.getRole());
-        String jwt = jwtService.generateToken(user.getUsername());
+        String jwt = jwtService.generateToken(user.getUsername(), user.getRole());
         return AuthResponse.builder()
                 .token(jwt)
                 .build();
@@ -53,8 +51,7 @@ public class AuthService {
         User user = new User(request.getUsername(), request.getEmail(),
                 passwordEncoder.encode(request.getPassword()));
         repo.save(user);
-        Map<String, Object> claims = Map.of("role", user.getRole());
-        String jwt = jwtService.generateToken(user.getUsername());
+        String jwt = jwtService.generateToken(user.getUsername(), user.getRole());
         return AuthResponse.builder()
                 .token(jwt)
                 .build();

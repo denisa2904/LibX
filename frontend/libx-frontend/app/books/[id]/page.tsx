@@ -33,7 +33,7 @@ export default function BookPage({ params }: BookPageProps) {
     }
 
     if (!book) {
-        return <NotFound />; // Render the NotFound component if no book is found
+        return <NotFound />; 
     }
 
     return (
