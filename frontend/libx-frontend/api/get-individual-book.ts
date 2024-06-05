@@ -17,7 +17,7 @@ export interface Book {
 }
 
 export interface Genre {
-    id: string;
+    // id: string;
     title: string;
 }
 

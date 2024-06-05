@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Book } from './get-individual-book';
+import { Book_with_no_id } from '@/app/books/page';
 const API_URL = 'http://localhost:9000/api/books';
 
-export const addBook = async (bookData: Book): Promise<boolean> => {
+export const addBook = async (bookData: Book_with_no_id): Promise<boolean> => {
     try {
         const response = await fetch(`${API_URL}`, {
             method: 'POST',
@@ -53,7 +54,7 @@ export const updateBookPhoto = async (bookId: string, image: File): Promise<bool
 
     try {
         const response = await fetch(`${API_URL}/${bookId}/image`, {
-            method: 'POST',
+            method: 'PUT',
             body: formData,
             credentials: 'include'
         });

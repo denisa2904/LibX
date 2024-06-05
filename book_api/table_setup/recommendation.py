@@ -14,7 +14,7 @@ def setup_database(conn):
                 PRIMARY KEY (book_id, recommended_book_id),
                 FOREIGN KEY (book_id) REFERENCES book(id),
                 FOREIGN KEY (recommended_book_id) REFERENCES book(id)
-                ON DELETE NO ACTION 
+                ON DELETE CASCADE
             );
         """)
 
@@ -24,7 +24,7 @@ def insert_recommendation(conn, recs):
        'recs' is a list of tuples (book_id, recommended_book_id)."""
     with conn.cursor() as crs:
         crs.executemany("""
-            INSERT INTO recommendations (book_id, recommended_book_id) VALUES (%s, %s);
+            INSERT INTO recommendations (book_id, recommended_book_id) VALUES (%s, %s) ON CONFLICT DO NOTHING;
         """, recs)
 
 
@@ -78,10 +78,12 @@ def main():
     recs = get_recommendations(conn)
     insert_recommendation(conn, recs)
     recs = check_recommendation_table(conn)
+    # alter_table(conn)
     conn.close()
     print("Recommendations:")
     for rec in recs:
         print(f"{rec[0]} -> {rec[1]}")
+    return recs
 
 
 if __name__ == '__main__':

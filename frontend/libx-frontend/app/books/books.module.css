@@ -80,8 +80,7 @@
   z-index: 1;
 }
 
-/* In your CSS file */
 .carouselItem {
-  flex: 0 0 calc(33.33% - 1rem); /* Adjust the width as needed */
-  margin-right: 1rem; /* Add some spacing between items */
+  flex: 0 0 calc(33.33% - 1rem); 
+  margin-right: 1rem; 
 }

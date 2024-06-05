@@ -42,7 +42,7 @@ public class FirebaseStorageStrategy {
 
     public boolean uploadBytes(byte[] bytes, String fileName, String rootFolder) throws IOException {
         String unified = rootFolder + "/" + fileName;
-        BlobId blobId = BlobId.of("gs://libx-bc35e.appspot.com.com", unified);
+        BlobId blobId = BlobId.of("gs://libx-bc35e.appspot.com", unified);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
         Credentials credentials = GoogleCredentials.fromStream(new FileInputStream(firebasePropsPath));
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();

@@ -27,3 +27,4 @@ libX/src/main/resources/firebaseProps.json
 book_api/table_setup/connection/db_connection
 libX/src/main/resources/application.properties
 libX/src/main/resources/application.properties
+book_api/firebase/sdk/firebaseProps.json

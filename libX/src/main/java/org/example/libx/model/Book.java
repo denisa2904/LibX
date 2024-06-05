@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.util.List;
 import java.util.UUID;
@@ -15,7 +16,9 @@ import java.util.UUID;
 public class Book {
 
     @Id
-    @Column(name = "id", updatable = false, nullable = false)
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    @Column(name = "id", updatable = false)
     private UUID id;
 
     @Column(name = "google_id")
@@ -47,7 +50,7 @@ public class Book {
     @OneToOne(mappedBy = "book", cascade = CascadeType.REMOVE)
     private Image image;
 
-    @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "book_genres",
             joinColumns = @JoinColumn(name = "book_id"),
@@ -56,7 +59,7 @@ public class Book {
     private List<Genre> genres;
 
     @JsonIgnore
-    @ManyToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "recommendations",
             joinColumns = @JoinColumn(name = "book_id"),
@@ -86,6 +89,7 @@ public class Book {
                 ", isbn='" + getIsbn() + '\'' +
                 ", year=" + getYear() +
                 ", description='" + getDescription() + '\'' +
+                ", genres=" + getGenres() +
                 '}';
     }
 

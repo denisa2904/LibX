@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -44,8 +45,17 @@ public class ImageService {
         return 0;
     }
 
-    public int deleteImage(UUID imageId) {
-        imageRepo.deleteById(imageId);
+    public int deleteImage(UUID imageId) throws IOException {
+        Optional<Image> imageMaybe = imageRepo.findById(imageId);
+        if(imageMaybe.isEmpty())
+            return 0;
+        Image image = imageMaybe.get();
+        String path = image.getBook().getId().toString() + image.getType() ;
+        System.out.println(path);
+        if(firebaseStorageStrategy.deleteFile(imageId.toString())) {
+            imageRepo.deleteById(imageId);
+            return 1;
+        }
         return 1;
     }
 
@@ -55,7 +65,13 @@ public class ImageService {
             return 0;
         Optional<Image> oldImage = getImageByBookId(bookId);
         String oldImageLocation = "";
-        oldImage.ifPresent(value -> deleteImage(value.getId()));
+        oldImage.ifPresent(value -> {
+            try {
+                deleteImage(value.getId());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         String id = book.get().getId().toString();
         String FileType = image.getContentType();

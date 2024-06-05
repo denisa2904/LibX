@@ -45,16 +45,12 @@ public class BookController {
 
     @GetMapping("{id}")
     public ResponseEntity<?> getBookById(@PathVariable("id") UUID id) {
-        if(bookService.getBookById(id).isEmpty())
+        Optional<Book> bookMaybe = bookService.getBookById(id);
+        if(bookMaybe.isEmpty())
             return ResponseEntity.status(NOT_FOUND).body("Book not found.".getBytes());
-        return ResponseEntity.status(OK).body(bookService.getBookById(id).get());
-    }
-
-    @GetMapping("title/{title}")
-    public ResponseEntity<?> getBookByTitle(@PathVariable("title") String title) {
-        if(bookService.getBookByTitle(title).isEmpty())
-            return ResponseEntity.status(NOT_FOUND).body("Book not found.".getBytes());
-        return ResponseEntity.status(OK).body(bookService.getBookByTitle(title).get());
+        Book book = bookMaybe.get();
+        System.out.println(book);
+        return ResponseEntity.status(OK).body(book);
     }
 
     @GetMapping("author/{author}")
@@ -123,31 +119,31 @@ public class BookController {
 
     @PostMapping
     public ResponseEntity<?> addBook(@RequestBody Book book) {
-        if(bookService.addBook(book) == 1)
+        if(bookService.addBook(book) == 1) {
+            bookService.updateRecommended();
             return ResponseEntity.status(CREATED).body("Book added successfully.".getBytes());
+        }
         return ResponseEntity.status(BAD_REQUEST).body("Book already exists or is invalid.".getBytes());
     }
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteBook(@PathVariable("id") UUID id) {
-        if(bookService.deleteBook(id) == 1)
+        if(bookService.deleteBook(id) == 1) {
+            bookService.updateRecommended();
             return ResponseEntity.status(NO_CONTENT).body("Book deleted successfully.".getBytes());
-        System.out.println();
-        System.out.println();
-        System.out.println("Book not found.");
-        System.out.println();
-        System.out.println();
+        }
         return ResponseEntity.status(NOT_FOUND).body("Book not found.".getBytes());
     }
 
     @PutMapping("{id}")
     public ResponseEntity<?> updateBook(@PathVariable("id") UUID id, @RequestBody Book book) {
-        if(bookService.updateBook(id, book) == 1)
-            return ResponseEntity.status(NO_CONTENT).body("Book updated successfully.".getBytes());
+        if(bookService.updateBook(id, book) == 1){
+            bookService.updateRecommended();
+            return ResponseEntity.status(NO_CONTENT).body("Book updated successfully.".getBytes());}
         return ResponseEntity.status(NOT_FOUND).body("Book not found.".getBytes());
     }
 
-    @PutMapping("{id}/image")
+    @PutMapping(path = "{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<byte[]> uploadBookImage(@PathVariable("id") UUID id, @RequestParam("image") MultipartFile image) {
         if(imageService.uploadImage(id, image) == 1)
             return ResponseEntity.status(NO_CONTENT).body("Image uploaded successfully.".getBytes());

@@ -7,8 +7,13 @@ import org.example.libx.model.Genre;
 import org.example.libx.model.User;
 import org.example.libx.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 @Service
@@ -18,18 +23,22 @@ public class BookService {
     private final CommentRepo commentRepo;
     private final ImageRepo imageRepo;
     private final RatingRepo ratingRepo;
-
     private final UserRepo userRepo;
 
+    private final GenreRepo genreRepo;
+
+    @Autowired
+    private RestTemplate restTemplate;
 
 
     @Autowired
-    public BookService(BookRepo bookRepo, CommentRepo commentRepo, ImageRepo imageRepo, RatingRepo ratingRepo, UserRepo userRepo) {
+    public BookService(BookRepo bookRepo, CommentRepo commentRepo, ImageRepo imageRepo, RatingRepo ratingRepo, UserRepo userRepo, GenreRepo genreRepo) {
         this.bookRepo = bookRepo;
         this.commentRepo = commentRepo;
         this.imageRepo = imageRepo;
         this.ratingRepo = ratingRepo;
         this.userRepo = userRepo;
+        this.genreRepo = genreRepo;
     }
 
     public boolean validateNewBook(Book book) {
@@ -45,10 +54,28 @@ public class BookService {
 
     public int addBook(Book book) {
         if(validateNewBook(book)) {
+            List<Genre> genres = new ArrayList<>();
+            for (Genre genre : book.getGenres()) {
+                Optional<Genre> genreOptional = genreRepo.findGenreByTitle(genre.getTitle());
+                if (genreOptional.isEmpty()) {
+                    genreRepo.save(genre);
+                    genres.add(genre);
+                } else {
+                    genres.add(genreOptional.get());
+                }
+            }
+            book.setGenres(genres);
             bookRepo.save(book);
             return 1;
         }
         return 0;
+    }
+
+    public int updateRecommended(){
+        Book book = new Book();
+        String url = "http://localhost:8000/add_book/";
+        ResponseEntity<String> response = restTemplate.postForEntity(url, book, String.class);
+        return 1;
     }
 
     public List<Book> getAllBooks() {
@@ -60,6 +87,7 @@ public class BookService {
     }
 
     public Optional<Book> getBookById(UUID id) {
+
         return bookRepo.findById(id);
     }
 
@@ -152,44 +180,64 @@ public class BookService {
     }
 
     public int updateBook(UUID id, Book book) {
+        List<Genre> genres = book.getGenres();
         Optional<Book> oldBook = bookRepo.findById(id);
-        if(oldBook.isEmpty())
+        if (oldBook.isEmpty())
             return 0;
+
         Book updatedBook = oldBook.get();
         updatedBook.setTitle(book.getTitle());
         updatedBook.setAuthor(book.getAuthor());
         updatedBook.setPublisher(book.getPublisher());
         updatedBook.setYear(book.getYear());
-        updatedBook.setGenres(book.getGenres());
         updatedBook.setRating(book.getRating());
         updatedBook.setDescription(book.getDescription());
+
+        // Ensure genres are saved properly
+        List<Genre> managedGenres = new ArrayList<>();
+        for (Genre genre : genres) {
+            Optional<Genre> genreOptional = genreRepo.findGenreByTitle(genre.getTitle());
+            if (genreOptional.isEmpty()) {
+                genre = genreRepo.save(genre);
+            } else {
+                genre = genreOptional.get();
+            }
+            managedGenres.add(genre);
+        }
+        updatedBook.setGenres(managedGenres);
+
         bookRepo.save(updatedBook);
         return 1;
     }
 
     public int deleteBook(UUID id) {
-        try{
-            Optional<Book> book = bookRepo.findById(id);
-            if(book.isEmpty())
+        try {
+            Optional<Book> bookOptional = bookRepo.findById(id);
+            if (bookOptional.isEmpty()) {
                 return 0;
+            }
+            Book book = bookOptional.get();
+
             List<User> users = userRepo.findAll();
-            for(User user : users){
-                user.getFavorites().remove(book.get());
-                user.getRentedBooks().remove(book.get());
+            for (User user : users) {
+                user.getFavorites().remove(book);
+                user.getRentedBooks().remove(book);
+                userRepo.save(user);
             }
-            for(Book b : book.get().getRecommendations()){
-                b.getRecommendations().remove(book.get());
+
+            commentRepo.deleteAllByBookId(book.getId());
+            if (book.getImage() != null) {
+                imageRepo.delete(book.getImage());
             }
-            commentRepo.deleteAllByBookId(book.get().getId());
-            imageRepo.delete(book.get().getImage());
-            ratingRepo.deleteAllByBookId(book.get().getId());
+            ratingRepo.deleteAllByBookId(book.getId());
+
+
+            bookRepo.deleteAllRecommendationsInvolvingBookId(book.getId());
+
             bookRepo.deleteById(id);
-            Optional<Book> b = bookRepo.findById(id);
-            if(b.isPresent()) {
-                System.out.println();
-                System.out.println();
-                System.out.println();
-                System.out.println("Book not deleted");
+
+            if (bookRepo.findById(id).isPresent()) {
+                return 0;
             }
         } catch (Exception e) {
             return 0;

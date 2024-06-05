@@ -8,12 +8,10 @@ from google.cloud import datastore
 from requests.exceptions import RequestException
 from table_setup.connection.connect_db import connect_to_db
 
-# Set up Google Cloud Datastore
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'cloud_sdk/libx-bc35e-535ab2ee56a3.json'
 datastore_client = datastore.Client()
 
-# Initialize Firebase Admin
-cred = credentials.Certificate('sdk/libx-bc35e-firebase-adminsdk-w56by-904deb33b8.json')
+cred = credentials.Certificate('sdk/firebaseProps.json')
 app = firebase_admin.initialize_app(cred, {
     'storageBucket': 'libx-bc35e.appspot.com'
 })
@@ -101,6 +99,8 @@ def main():
         else:
             conn = connect_to_db()
             with conn.cursor() as cur:
+                cur.execute("DELETE FROM book_genres WHERE book_id = (SELECT id FROM book WHERE google_id = %s)", (book_id,))
+                cur.execute("DELETE FROM recommendations WHERE book_id = (SELECT id FROM book WHERE google_id = %s) OR recommended_book_id= (SELECT id FROM book WHERE google_id = %s)", (book_id,book_id,))
                 cur.execute("DELETE FROM images WHERE book_id = (SELECT id FROM book WHERE google_id = %s)", (book_id,))
                 cur.execute("DELETE FROM book WHERE google_id = %s", (book_id,))
             conn.close()

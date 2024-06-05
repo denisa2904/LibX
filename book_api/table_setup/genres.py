@@ -28,7 +28,7 @@ def create_tables():
                 PRIMARY KEY (book_id, genre_id),
                 FOREIGN KEY (book_id) REFERENCES book (id),
                 FOREIGN KEY (genre_id) REFERENCES genres (id)
-                ON DELETE NO ACTION
+                ON DELETE CASCADE
             );
         """)
     conn.close()
@@ -47,7 +47,7 @@ def insert_genre(conn, genre):
     genre_id = str(uuid.uuid4())
     with conn.cursor() as cur:
         cur.execute("""
-            INSERT INTO genres (id, genre) VALUES (%s, %s) ON CONFLICT (genre) DO NOTHING RETURNING id;
+            INSERT INTO genres (id, genre) VALUES (%s, %s) ON CONFLICT (genre) DO NOTHING;
         """, (genre_id, genre))
         return genre_id
 
@@ -55,7 +55,7 @@ def insert_genre(conn, genre):
 def link_book_to_genre(conn, book_id, genre_id):
     with conn.cursor() as cur:
         cur.execute("""
-            INSERT INTO book_genres (book_id, genre_id) VALUES (%s, %s) ON CONFLICT DO NOTHING RETURNING book_id, genre_id;
+            INSERT INTO book_genres (book_id, genre_id) VALUES (%s, %s) ON CONFLICT DO NOTHING;
         """, (book_id, genre_id))
 
 
@@ -81,10 +81,12 @@ def process_genres():
     conn.close()
 
 
+
 def main():
     create_tables()
     process_genres()
     conn = connect_to_db()
+    # alter_table(conn)
     conn.close()
 
 
