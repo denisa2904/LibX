@@ -22,7 +22,7 @@ public class FirebaseStorageStrategy {
 
     private String uploadFile(File file, String fileName, String rootFolder) throws IOException {
         String unified = rootFolder + "/" + fileName;
-        BlobId blobId = BlobId.of("gs://libx-bc35e.appspot.com", unified);
+        BlobId blobId = BlobId.of("libx-bc35e.appspot.com", unified);
         BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
         Credentials credentials = GoogleCredentials.fromStream(new FileInputStream(firebasePropsPath));
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
@@ -40,10 +40,14 @@ public class FirebaseStorageStrategy {
         return tempFile;
     }
 
-    public boolean uploadBytes(byte[] bytes, String fileName, String rootFolder) throws IOException {
-        String unified = rootFolder + "/" + fileName;
-        BlobId blobId = BlobId.of("gs://libx-bc35e.appspot.com", unified);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
+    public boolean uploadBytes(byte[] bytes, String fileName, String type) throws IOException {
+        String type_ = type.split("/")[1];
+        if (type_.equals("jpeg")) {
+            type_ = "jpg";
+        }
+        String unified = fileName + '.' + type_;
+        BlobId blobId = BlobId.of("libx-bc35e.appspot.com", unified);
+        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType(type).build();
         Credentials credentials = GoogleCredentials.fromStream(new FileInputStream(firebasePropsPath));
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
         storage.create(blobInfo, bytes);
@@ -66,28 +70,23 @@ public class FirebaseStorageStrategy {
         try (FileInputStream serviceAccountStream = new FileInputStream(firebasePropsPath)) {
             Credentials credentials = GoogleCredentials.fromStream(serviceAccountStream);
             Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-            fullPath = fullPath + ".jpg";
 
             Blob blob = storage.get(BlobId.of("libx-bc35e.appspot.com", fullPath));
             if (blob == null) {
-                System.out.println("BLOB IS NULL");
                 throw new IOException("Blob not found for path: " + fullPath);
             }
             byte[] content = blob.getContent();
             if (content == null || content.length == 0) {
-                System.out.println("Blob content is empty");
                 throw new IOException("Blob content is empty for path: " + fullPath);
             }
             return content;
         } catch (IOException e) {
-            System.err.println("Error in download method: " + e.getMessage());
-            e.printStackTrace();
             throw new IOException("Failed to download file from Firebase Storage", e);
         }
     }
 
     public boolean deleteFile(String fullPath) throws IOException{
-        BlobId blobId = BlobId.of("gs://libx-bc35e.appspot.com", fullPath);
+        BlobId blobId = BlobId.of("libx-bc35e.appspot.com", fullPath);
         Credentials credentials = GoogleCredentials.fromStream(new FileInputStream(firebasePropsPath));
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
         return storage.delete(blobId);

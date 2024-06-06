@@ -33,13 +33,10 @@ public class AuthController {
     @GetMapping(path = "/check")
     public ResponseEntity<String> checkAuth(@NonNull HttpServletRequest request) {
         if (userService.getUsernameFromJwt(request) != null) {
-            System.out.println("User is authenticated");
             User user = userService.getUserByUsername(userService.getUsernameFromJwt(request));
             String role = user.getRole();
-            System.out.println(role);
             return ResponseEntity.status(HttpStatus.OK).body(role);
         } else {
-            System.out.println("User is not authenticated");
             return ResponseEntity.status(HttpStatus.OK).body("User is not authenticated");
         }
     }
@@ -61,12 +58,10 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request, HttpServletResponse response) {
         AuthResponse authResponse = service.login(request);
         if(authResponse == null){
-            System.out.println("Invalid login");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON)
                     .body(AuthResponse.builder().token("Invalid").build());
         }
         setHttpOnlyCookie(response, authResponse.getToken());
-        System.out.println("Logged in");
         return ResponseEntity.ok(authResponse);
     }
 
@@ -78,7 +73,6 @@ public class AuthController {
         cookie.setMaxAge(0);
         cookie.setSecure(true);
         response.addCookie(cookie);
-        System.out.println("Logged out");
         return ResponseEntity.ok("Logged out successfully");
     }
 

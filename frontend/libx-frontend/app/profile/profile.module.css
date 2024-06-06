@@ -1,0 +1,62 @@
+
+
+.profileContainer {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 20px; /* Makes the entire container rounder */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Optional: adds subtle shadow for depth */
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+    border-radius: 15px; /* Rounder corners for the header specifically */
+}
+
+.profileName {
+    font-size: 24px;
+    color: #333;
+}
+
+.details {
+    margin-top: 20px;
+    border-radius: 10px; /* Apply rounding to detail sections if separate */
+}
+
+.editButton, .favoritesButton, .rentedButton {
+    background-color: --secondary;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 10px; /* Rounded buttons */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.button:hover, .editButton:hover, .favoritesButton:hover, .rentedButton:hover {
+    background-color: --primary;
+    transform: scale(1.05); /* Hover effect for buttons */
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    border-radius: 10px; /* Optional: If actions are in a separate container */
+}
+
+.input[enabled] {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.input[disabled] {
+    background-color: #eee;
+    cursor: not-allowed;
+}

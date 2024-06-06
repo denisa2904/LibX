@@ -7,7 +7,7 @@ export default function SideNav() {
     <div className="flex h-full flex-col px-3 py-4 md:px-2">
       <Link
         className="mb-2 flex h-20 items-center justify-center rounded-md bg-primary p-4 md:h-40"
-        href="/"
+        href="/home"
       >
           <div className="flex items-center cursor-pointer w-20 h-20 md:w-32 md:h-32">
           <div className="relative w-full h-full">

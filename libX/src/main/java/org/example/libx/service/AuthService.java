@@ -31,11 +31,9 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request){
-        System.out.println(request.getUsername() + " " + request.getPassword());
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
         );
-        System.out.println("Authenticated");
         Optional<User> userOptional = repo.findUserByUsername(request.getUsername());
         User user;
         if(userOptional.isPresent())

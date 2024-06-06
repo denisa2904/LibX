@@ -28,7 +28,7 @@ def fetch_book_ids():
             img_id = str(uuid.uuid4())
             real_id = get_id_for_book(google_id)
             cur.execute("INSERT INTO images (id, title, book_id, type) "
-                        "VALUES (%s, %s, %s, 'image/jpeg')", (img_id, real_id, real_id))
+                        "VALUES (%s, %s, %s, 'image/jpeg') ON CONFLICT DO NOTHING", (img_id, real_id, real_id))
     conn.close()
     return book_ids
 

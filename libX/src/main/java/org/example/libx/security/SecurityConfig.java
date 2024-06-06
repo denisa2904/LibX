@@ -41,6 +41,8 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.POST, "/api/books").permitAll();
                     auth.requestMatchers(HttpMethod.PUT, "/api/books/**").permitAll();
                     auth.requestMatchers(HttpMethod.DELETE, "/api/books/**").permitAll();
+                    auth.requestMatchers(HttpMethod.GET, "/api/users/self").permitAll();
+                    auth.requestMatchers(HttpMethod.PUT, "/api/users/updateSelf").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

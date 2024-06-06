@@ -1,0 +1,69 @@
+.backgroundContainer {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    background-image: url('/background.jpg');
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+  }
+  
+  .contentContainer {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.85);
+    padding: 20px;
+    border-radius: 10px;
+    overflow: auto;
+  }
+  
+  .genreCard {
+    position: relative;
+    width: 100%;
+    height: 150px;
+    overflow: hidden;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin: 0.5rem;
+  }
+  
+  @media (min-width: 640px) {
+    .genreCard {
+      width: 200px;
+      height: 300px;
+    }
+  }
+  
+  .genreImage {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .genreCard:hover .genreImage {
+    transform: scale(1.1);
+  }
+  
+  .genreOverlay {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    text-align: center;
+    padding: 10px;
+    font-size: 1.2rem;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+  }
+

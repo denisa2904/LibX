@@ -11,7 +11,8 @@ import {
   ExclamationCircleIcon,
   ArrowRightIcon,
 } from '@heroicons/react/24/outline';
-import { register as registerUser } from '@/api/auth';
+import { register as registerUser, useAuth } from '@/api/auth';
+import { useRouter } from 'next/navigation';
 
 const schema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -20,6 +21,8 @@ const schema = z.object({
 });
 
 export default function RegisterForm() {
+  const router = useRouter();
+  const { setIsAuthenticated } = useAuth();
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: zodResolver(schema)
     });
@@ -30,6 +33,9 @@ export default function RegisterForm() {
             const response = await registerUser(data); 
             console.log('Registration successful:', response);
             setErrorMessage('');
+            setIsAuthenticated(true);
+            router.push('/profile');
+            
         } catch (error: any) {
             console.error('Registration error:', error);
             setErrorMessage(error.message || 'Failed to register');

@@ -11,9 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
 
 @Service
@@ -22,6 +19,8 @@ public class BookService {
     private final BookRepo bookRepo;
     private final CommentRepo commentRepo;
     private final ImageRepo imageRepo;
+
+    private final ImageService imageService;
     private final RatingRepo ratingRepo;
     private final UserRepo userRepo;
 
@@ -32,13 +31,14 @@ public class BookService {
 
 
     @Autowired
-    public BookService(BookRepo bookRepo, CommentRepo commentRepo, ImageRepo imageRepo, RatingRepo ratingRepo, UserRepo userRepo, GenreRepo genreRepo) {
+    public BookService(BookRepo bookRepo, CommentRepo commentRepo, ImageRepo imageRepo, RatingRepo ratingRepo, UserRepo userRepo, GenreRepo genreRepo, ImageService imageService) {
         this.bookRepo = bookRepo;
         this.commentRepo = commentRepo;
         this.imageRepo = imageRepo;
         this.ratingRepo = ratingRepo;
         this.userRepo = userRepo;
         this.genreRepo = genreRepo;
+        this.imageService = imageService;
     }
 
     public boolean validateNewBook(Book book) {
@@ -71,11 +71,10 @@ public class BookService {
         return 0;
     }
 
-    public int updateRecommended(){
+    public void updateRecommended(){
         Book book = new Book();
         String url = "http://localhost:8000/add_book/";
         ResponseEntity<String> response = restTemplate.postForEntity(url, book, String.class);
-        return 1;
     }
 
     public List<Book> getAllBooks() {
@@ -89,10 +88,6 @@ public class BookService {
     public Optional<Book> getBookById(UUID id) {
 
         return bookRepo.findById(id);
-    }
-
-    public Optional<Book> getBookByTitle(String title) {
-        return bookRepo.findBookByTitle(title);
     }
 
     public List<Book> getBooksByPublisher(String publisher) {
@@ -126,12 +121,10 @@ public class BookService {
         books.addAll(bookRepo.findAllByAuthorContaining(search));
         books.addAll(bookRepo.findAllByPublisherContaining(search));
         books.addAll(bookRepo.findAllByDescriptionContaining(search));
-        // if year is a number, convert to int and search by year
         try {
             int year = Integer.parseInt(search);
             books.addAll(bookRepo.findAllByYear(year));
-        } catch (NumberFormatException e) {
-            // do nothing
+        } catch (NumberFormatException ignored) {
         }
         return books;
     }
@@ -192,8 +185,6 @@ public class BookService {
         updatedBook.setYear(book.getYear());
         updatedBook.setRating(book.getRating());
         updatedBook.setDescription(book.getDescription());
-
-        // Ensure genres are saved properly
         List<Genre> managedGenres = new ArrayList<>();
         for (Genre genre : genres) {
             Optional<Genre> genreOptional = genreRepo.findGenreByTitle(genre.getTitle());
@@ -227,7 +218,7 @@ public class BookService {
 
             commentRepo.deleteAllByBookId(book.getId());
             if (book.getImage() != null) {
-                imageRepo.delete(book.getImage());
+                imageService.deleteImage(book.getImage().getId());
             }
             ratingRepo.deleteAllByBookId(book.getId());
 

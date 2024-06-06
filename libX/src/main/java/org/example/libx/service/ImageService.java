@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import org.example.libx.firebase.FirebaseStorageStrategy;
 import org.example.libx.model.Book;
 import org.example.libx.model.Image;
+import org.example.libx.repository.BookRepo;
 import org.example.libx.repository.ImageRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,13 +19,13 @@ import java.util.logging.Logger;
 @Transactional
 public class ImageService {
     private final ImageRepo imageRepo;
-    private final BookService bookService;
+    private final BookRepo bookRepo;
     private final FirebaseStorageStrategy firebaseStorageStrategy;
 
     @Autowired
-    public ImageService(ImageRepo imageRepo, BookService bookService, FirebaseStorageStrategy firebaseStorageStrategy) {
+    public ImageService(ImageRepo imageRepo, BookRepo bookRepo, FirebaseStorageStrategy firebaseStorageStrategy) {
         this.imageRepo = imageRepo;
-        this.bookService = bookService;
+        this.bookRepo = bookRepo;
         this.firebaseStorageStrategy = firebaseStorageStrategy;
     }
 
@@ -35,9 +36,9 @@ public class ImageService {
     }
 
     public int addImage(Image image, UUID bookId) {
-        if(bookService.getBookById(bookId).isPresent())
+        if(bookRepo.findById(bookId).isPresent())
         {
-            image.setBook(bookService.getBookById(bookId).get());
+            image.setBook(bookRepo.findById(bookId).get());
             image.setTitle(bookId.toString());
             imageRepo.save(image);
             return 1;
@@ -51,7 +52,6 @@ public class ImageService {
             return 0;
         Image image = imageMaybe.get();
         String path = image.getBook().getId().toString() + image.getType() ;
-        System.out.println(path);
         if(firebaseStorageStrategy.deleteFile(imageId.toString())) {
             imageRepo.deleteById(imageId);
             return 1;
@@ -60,27 +60,47 @@ public class ImageService {
     }
 
     public int uploadImage(UUID bookId, MultipartFile image) {
-        Optional<Book> book = bookService.getBookById(bookId);
+        System.out.println();
+        System.out.println();
+        System.out.println("Book ID: " + bookId);
+        System.out.println();
+        System.out.println();
+        Optional<Book> book = bookRepo.findById(bookId);
         if(book.isEmpty())
             return 0;
+        System.out.println();
+        System.out.println();
+        System.out.println("Book: " + book.get());
+        System.out.println();
+        System.out.println();
         Optional<Image> oldImage = getImageByBookId(bookId);
-        String oldImageLocation = "";
         oldImage.ifPresent(value -> {
             try {
+                String oldImageLocation = bookId + oldImage.get().getType();
                 deleteImage(value.getId());
+                imageRepo.delete(value);
+                firebaseStorageStrategy.deleteFile(oldImageLocation);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
-
+        System.out.println();
+        System.out.println();
+        System.out.println("Image: " + image);
+        System.out.println();
+        System.out.println();
         String id = book.get().getId().toString();
         String FileType = image.getContentType();
         Image image1 = new Image(id, FileType);
         if(addImage(image1, bookId) == 0)
             return 0;
+        System.out.println();
+        System.out.println();
+        System.out.println("Image Type: " + FileType);
+        System.out.println();
+        System.out.println();
         try{
-            firebaseStorageStrategy.deleteFile(oldImageLocation);
-            firebaseStorageStrategy.upload(image, image.getOriginalFilename(), id);
+            firebaseStorageStrategy.uploadBytes(image.getBytes(), bookId.toString(), FileType);
             return 1;
         } catch (Exception e) {
             logger.log(java.util.logging.Level.SEVERE, e.toString(), e);

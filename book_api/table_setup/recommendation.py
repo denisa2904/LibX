@@ -8,6 +8,7 @@ def setup_database(conn):
     """Creates the necessary tables for the recommendation module."""
     with conn.cursor() as crs:
         crs.execute("""
+            DROP TABLE IF EXISTS recommendations;
             CREATE TABLE IF NOT EXISTS recommendations (
                 book_id UUID NOT NULL,
                 recommended_book_id UUID NOT NULL,
@@ -78,11 +79,8 @@ def main():
     recs = get_recommendations(conn)
     insert_recommendation(conn, recs)
     recs = check_recommendation_table(conn)
-    # alter_table(conn)
     conn.close()
     print("Recommendations:")
-    for rec in recs:
-        print(f"{rec[0]} -> {rec[1]}")
     return recs
 
 

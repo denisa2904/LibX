@@ -100,6 +100,21 @@ public class UserController {
         return ResponseEntity.status(CREATED).body("Book rented");
     }
 
+    @GetMapping(path = "/rented/{bookId}")
+    public ResponseEntity<?> getRentedBook(@NonNull HttpServletRequest request, @PathVariable("bookId") UUID bookId) {
+        User user = getUser(request);
+        if (user == null)
+            return ResponseEntity.status(NOT_FOUND).body("User not found");
+
+        Optional<Book> bookMaybe = bookService.getBookById(bookId);
+        if (bookMaybe.isEmpty())
+            return ResponseEntity.status(NOT_FOUND).body("Book not found");
+        Book book = bookMaybe.get();
+        if (user.getRentedBooks().contains(book))
+            return ResponseEntity.status(OK).body(book);
+        return ResponseEntity.status(NOT_FOUND).body("Rented book not found");
+    }
+
     @GetMapping(path = "/favorites")
     public ResponseEntity<?> getFavorites(@NonNull HttpServletRequest request) {
         User user = getUser(request);

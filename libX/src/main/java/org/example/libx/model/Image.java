@@ -33,7 +33,7 @@ public class Image {
             nullable = false)
     private String type;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne
     @JsonIgnore
     @JoinColumn(name = "book_id", referencedColumnName = "id")
     private Book book;
@@ -44,7 +44,7 @@ public class Image {
     public Image(String title, String type) {
         this.id = UUID.randomUUID();
         this.title = title;
-        this.type = "image/"+type;
+        this.type = type;
     }
 
     @Override

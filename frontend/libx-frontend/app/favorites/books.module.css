@@ -84,37 +84,3 @@
   flex: 0 0 calc(33.33% - 1rem); 
   margin-right: 1rem; 
 }
-/* Common styles for both Rent and Return buttons */
-.pl-2 {
-  padding-left: 8px; /* Adjust padding as necessary */
-}
-
-.pb-3 {
-  padding-bottom: 12px; /* Adjust padding as necessary */
-}
-
-.rentButton, .returnButton {
-  color: white; /* Text color */
-  background-color: #4CAF50; /* Green background for availability */
-  border: none;
-  border-radius: 5px;
-  padding: 10px 20px;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.2s;
-}
-
-.rentButton:hover, .returnButton:hover {
-  background-color: #45a049; /* Slightly darker on hover */
-  transform: scale(1.05); /* Slight scale up effect */
-}
-
-/* Specific styles for Rent button */
-.rentButton {
-  background-color: #4CAF50; /* Green, suggesting availability */
-}
-
-/* Specific styles for Return button */
-.returnButton {
-  background-color: #f44336; /* Red, suggesting action to return */
-}
-

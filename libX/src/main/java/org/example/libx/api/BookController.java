@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.Optional;
 
@@ -91,9 +92,9 @@ public class BookController {
         try {
             String imagePath = image.get().getTitle();
             String imageType = image.get().getType();
-            System.out.println("Image path: " + imagePath);
-            System.out.println("Image type: " + imageType);
-
+            if (Objects.equals(imageType, "image/jpeg"))
+                imageType = "image/jpg";
+            imagePath = imagePath + "." + imageType.split("/")[1];
             byte[] img = firebaseStorageStrategy.download(imagePath);
             System.out.println("Image downloaded successfully, size: " + img.length + " bytes");
 
@@ -145,8 +146,9 @@ public class BookController {
 
     @PutMapping(path = "{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<byte[]> uploadBookImage(@PathVariable("id") UUID id, @RequestParam("image") MultipartFile image) {
-        if(imageService.uploadImage(id, image) == 1)
+        if(imageService.uploadImage(id, image) == 1){
             return ResponseEntity.status(NO_CONTENT).body("Image uploaded successfully.".getBytes());
+        }
         return ResponseEntity.status(NOT_ACCEPTABLE).body("Image is invalid.".getBytes());
     }
 

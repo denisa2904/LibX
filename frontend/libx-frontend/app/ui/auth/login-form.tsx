@@ -36,7 +36,7 @@ export default function LoginForm() {
                 console.log('Login successful:', response);
                 setErrorMessage('');
                 setIsAuthenticated(true);
-                router.push('/home');
+                router.push('/profile');
             }
             else{
                 setErrorMessage('Failed to login');

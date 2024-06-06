@@ -49,6 +49,19 @@ export const getRentals = async (): Promise<Book[]> => {
     }
 }
 
+export const isRented = async (bookId : string) => {
+    const response = await fetch(`${API_URL}/rented/${bookId}`, {
+        method: 'GET',
+        credentials: 'include'
+    });
+
+    if (response.ok) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 export const addFavourite = async (bookId : string) => {
     const response = await fetch(`${API_URL}/favorites`, {
         method: 'POST',
@@ -111,3 +124,35 @@ export const isFavourite = async (bookId : string) => {
         return false;
     }
 }
+
+export const getUser = async (): Promise<User> => {
+    try {
+        const response = await fetch(`${API_URL}/self`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch user: ${response.status}`);
+        }
+        return await response.json() as User;
+    } catch (error) {
+        console.error('Fetch user error:', error);
+        throw error;  
+    }
+};
+
+export const updateUser = async (user: User): Promise<User> => {
+    try {
+        const response = await fetch(`${API_URL}/updateSelf`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(user),
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to update user: ${response.status}`);
+        }
+        return await response.json() as User;
+    } catch (error) {
+        console.error('Update user error:', error);
+        throw error;  
+    }
+};
