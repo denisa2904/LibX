@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { getBooks } from '@/api/get-books';
+import { getBooks, searchBooks } from '@/api/get-books';
 import BookImage from '@/app/ui/books/book_image';
 import { Pagination } from 'antd';
 import styles from './books.module.css';
@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Genre } from '@/api/get-individual-book';
 import { Book } from '@/api/get-individual-book';
+import { useSearchParams } from 'next/navigation';
 
 export interface Book_with_no_id {
     title: string;
@@ -43,19 +44,27 @@ const BooksComponent: React.FC = () => {
     genres: []
 });
   const { role } = useAuth();
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    getBooks()
-      .then(books => {
-        setBooks(books);
-        setLoading(false);
-      })
-      .catch(error => {
+    const query = searchParams.get('q');
+    
+    const fetchBooks = async () => {
+      setLoading(true);
+      try {
+        // Choose which function to call based on the presence of a query
+        const fetchedBooks = query ? await searchBooks(query) : await getBooks();
+        setBooks(fetchedBooks);
+      } catch (error) {
+        console.error('Failed to fetch books:', error);
         setError('Failed to fetch books');
+      } finally {
         setLoading(false);
-      });
-  }, []);
+      }
+    };
+
+    fetchBooks();
+  }, [searchParams]);
 
   const indexOfLastBook = currentPage * booksPerPage;
   const indexOfFirstBook = indexOfLastBook - booksPerPage;
@@ -64,12 +73,6 @@ const BooksComponent: React.FC = () => {
   const onPageChange = (page: number) => {
     setCurrentPage(page);
   };
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-        setImageFile(event.target.files[0]);
-    }
-  }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;

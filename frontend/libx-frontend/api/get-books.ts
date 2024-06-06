@@ -13,3 +13,17 @@ export const getBooks = async (): Promise<Book[]> => {
         throw error;  // Rethrowing the error to handle it in the component where this function is called
     }
 }
+
+export const searchBooks = async (query: string): Promise<Book[]> => {
+    try {
+        const response = await fetch(`http://localhost:9000/api/books/search?q=${query}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const books: Book[] = await response.json();
+        return books;
+    } catch (error) {
+        console.error("Failed to search books:", error);
+        throw error;
+    }
+}

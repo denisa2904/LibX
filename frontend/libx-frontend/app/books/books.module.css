@@ -118,3 +118,23 @@
   background-color: #f44336; /* Red, suggesting action to return */
 }
 
+.searchContainer {
+  display: flex;
+  justify-content: center; /* Center the search bar container horizontally */
+  padding: 10px 0; /* Adds some vertical padding */
+}
+
+.searchInput {
+  width: 60%; /* Adjust width to make it smaller */
+  padding: 8px 20px; /* Comfortable padding inside the search bar */
+  border-radius: 25px; /* Large border radius to make it rounder */
+  border: 1px solid #ccc; /* Subtle border */
+  outline: none; /* Removes the default focus outline */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* Soft shadow for 3D effect */
+  transition: all 0.3s ease; /* Smooth transition for focus effect */
+}
+
+.searchInput:focus {
+  border-color: #666; /* Changes border color on focus */
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2); /* Darker shadow on focus */
+}

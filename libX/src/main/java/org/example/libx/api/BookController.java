@@ -74,8 +74,9 @@ public class BookController {
         return bookService.getBooksByGenre(genre);
     }
 
-    @GetMapping("search={search}")
-    public List<Book> getBooksBySearch(@PathVariable("search") String search) {
+    @GetMapping("/search")
+    public List<Book> getBooksBySearch(@RequestParam("q") String search) {
+        System.out.println("Searching for books with: " + search);
         return bookService.getBooksBySearch(search);
     }
 
