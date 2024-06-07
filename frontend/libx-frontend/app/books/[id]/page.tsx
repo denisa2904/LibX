@@ -11,7 +11,7 @@ import styles from '@/app/books/books.module.css';
 import BookImage from '@/app/ui/books/book_image';
 import Autoplay from "embla-carousel-autoplay"
 import { useAuth } from '@/api/auth';
-import { isRented } from '@/api/actions';
+import { isRented, rentBook, returnBook } from '@/api/actions';
 import {
     Carousel,
     CarouselContent,
@@ -67,12 +67,22 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
     }
 
     const toggleRented = async () => {
-        if (isRentedBook) {
-            setIsRentedBook(false);
-        } else {
-            setIsRentedBook(true);
+        try {
+            if (isRentedBook) {
+                await returnBook(book.id);
+                setIsRentedBook(false);
+                console.log('Book returned successfully');
+            } else {
+                await rentBook(book.id);
+                setIsRentedBook(true);
+                console.log('Book rented successfully');
+            }
+        } catch (error) {
+            console.error('Failed to update rental status:', error);
         }
     };
+        
+
 
     return (
         <>

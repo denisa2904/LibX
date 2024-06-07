@@ -40,6 +40,23 @@ export const rentBook = async (bookId : string) => {
     }
 };
 
+export const returnBook = async (bookId : string) => {
+    const response = await fetch(`${API_URL}/rented/${bookId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include', 
+        body: JSON.stringify({ id: bookId })
+    });
+
+    if (response.ok) {
+        console.log('Book returned successfully');
+    } else {
+        console.error('Failed to return book');
+    }
+}
+
 export const getRentals = async (): Promise<Book[]> => {
     try {
         const response = await fetch(`${API_URL}/rented`, {

@@ -94,16 +94,9 @@ public class UserService {
         return user.map(User::getFavorites).orElse(null);
     }
 
-    public List<Book> getRecommendationsByFavorites(UUID userId){
+    public List<Book> getUserReadBooks(UUID userId){
         Optional<User> user = getUserById(userId);
-        List<Book> favorites = getUserFavorites(userId);
-        // use getRecommendedBooks from BookService to make a List of Books with recommendations for every book in favorites
-        Set<Book> recommendations = new HashSet<Book>();
-        for( Book book : favorites){
-            List<Book> recommended = bookService.getRecommendedBooks(book.getId());
-            recommendations.addAll(recommended);
-        }
-        return new ArrayList<>(recommendations);
+        return user.map(User::getReadBooks).orElse(null);
     }
 
     public int addFavorite(UUID userId, Book book){
@@ -130,6 +123,19 @@ public class UserService {
         Optional<User> user = getUserById(userId);
         if(user.isPresent()){
             user.get().getRentedBooks().add(book);
+            userRepo.save(user.get());
+            return 1;
+        }
+        return 0;
+    }
+
+    public int returnBook(UUID userId, Book book){
+        Optional<User> user = getUserById(userId);
+        if(user.isPresent()){
+            user.get().getRentedBooks().remove(book);
+            if(!user.get().getReadBooks().contains(book)) {
+                user.get().getReadBooks().add(book);
+            }
             userRepo.save(user.get());
             return 1;
         }

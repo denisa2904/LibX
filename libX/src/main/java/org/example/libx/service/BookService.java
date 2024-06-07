@@ -128,9 +128,10 @@ public class BookService {
         }
         return books;
     }
+
     public List<Book> getBooksByCriteria(Criteria criteria){
         List<Book> books = new ArrayList<>();
-        Map<String, List<String>> criteriaMap = new HashMap<>();
+        Map<String, List<String>> criteriaMap;
         System.out.println(criteria);
         criteriaMap = criteria.getCriteria();
         System.out.println(criteriaMap);
@@ -149,9 +150,9 @@ public class BookService {
                         books.addAll(bookRepo.findAllByPublisherContaining(publisher));
                 }
                 case "year" -> {
-                    int year_int = Integer.parseInt(entry.getValue().get(0));
-                    for (String year : entry.getValue())
-                        books.addAll(bookRepo.findAllByYear(year_int));
+                    for (String year : entry.getValue()){
+                        int year_int = Integer.parseInt(year);
+                        books.addAll(bookRepo.findAllByYear(year_int));}
                 }
                 case "genres" -> {
                     for (String genre : entry.getValue()) {

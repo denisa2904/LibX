@@ -29,7 +29,6 @@ export default function ProfilePage() {
 
     useEffect(() => {
         getUser().then((data) => {
-            console.log(data);
             setUser({
                 username: data.username,
                 email: data.email,

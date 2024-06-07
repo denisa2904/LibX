@@ -114,10 +114,13 @@ public class BookController {
         return bookService.getRecommendedBooks(id);
     }
 
-    @PostMapping("criteria")
-    public List<Book> getBooksByCriteria(@RequestBody Criteria criteria) {
-        return bookService.getBooksByCriteria(criteria);
+    @PostMapping("/criteria")
+    public ResponseEntity<List<Book>> getBooksByCriteria(@RequestBody Criteria criteria) {
+        System.out.println("Received criteria: {}"+ criteria);
+        List<Book> books = bookService.getBooksByCriteria(criteria);
+        return ResponseEntity.ok(books);
     }
+
 
     @PostMapping
     public ResponseEntity<?> addBook(@RequestBody Book book) {

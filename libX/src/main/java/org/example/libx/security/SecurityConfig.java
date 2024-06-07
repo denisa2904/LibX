@@ -32,6 +32,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers("/api/auth/**").permitAll();
+                    auth.requestMatchers(HttpMethod.POST, "/api/books/criteria").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/books").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/books/**").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/api/users/favorites").permitAll();
@@ -43,6 +44,12 @@ public class SecurityConfig {
                     auth.requestMatchers(HttpMethod.DELETE, "/api/books/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/users/self").permitAll();
                     auth.requestMatchers(HttpMethod.PUT, "/api/users/updateSelf").permitAll();
+                    auth.requestMatchers(HttpMethod.GET, "/api/users/rented").permitAll();
+                    auth.requestMatchers(HttpMethod.POST, "/api/users/rented").permitAll();
+                    auth.requestMatchers(HttpMethod.DELETE, "/api/users/rented/**").permitAll();
+                    auth.requestMatchers(HttpMethod.GET, "/api/users/rented/**").permitAll();
+                    auth.requestMatchers(HttpMethod.POST, "/api/users/history").permitAll();
+                    auth.requestMatchers(HttpMethod.GET, "/api/users/history").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
