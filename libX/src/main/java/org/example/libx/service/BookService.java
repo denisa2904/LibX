@@ -99,10 +99,13 @@ public class BookService {
     }
 
     public List<Book> getBooksByGenre(String genre) {
-        List<Genre> genres = new ArrayList<>();
-        Genre g = new Genre(genre);
-        genres.add(g);
-        return bookRepo.findAllByGenres(genres);
+        Optional<Genre> genreOptional = genreRepo.findGenreByTitle(genre);
+        if(genreOptional.isPresent()) {
+            List<Genre> genres = new ArrayList<>();
+            genres.add(genreOptional.get());
+            return bookRepo.findAllByGenres(genres);
+        }
+        return new ArrayList<>();
     }
     public List<Book> getBooksByRating(float rating) {
         return bookRepo.findAllByRating(rating);
@@ -128,49 +131,83 @@ public class BookService {
         }
         return books;
     }
-
+    /*
+    this is the body for criteria:
+    {
+    "criteria": {
+            "author":["Tolstoy"],
+            "year":["2021"],
+            "title":["Anna"],
+            "genres":["Fiction"]
+        }
+}
+    * */
     public List<Book> getBooksByCriteria(Criteria criteria){
-        List<Book> books = new ArrayList<>();
+        Set<Book> books = new HashSet<>();
         Map<String, List<String>> criteriaMap;
-        System.out.println(criteria);
         criteriaMap = criteria.getCriteria();
-        System.out.println(criteriaMap);
         for(Map.Entry<String, List<String>> entry : criteriaMap.entrySet()){
             switch (entry.getKey()) {
                 case "author" -> {
+                    Set<Book> tempBooks = new HashSet<>();
                     for (String author : entry.getValue())
-                        books.addAll(bookRepo.findAllByAuthorContaining(author));
+                        tempBooks.addAll(bookRepo.findAllByAuthorContaining(author));
+                    if (books.isEmpty())
+                        books.addAll(tempBooks);
+                    else
+                        books.retainAll(tempBooks);
                 }
                 case "title" -> {
+                    Set<Book> tempBooks = new HashSet<>();
                     for (String title : entry.getValue())
-                        books.addAll(bookRepo.findAllByTitleContaining(title));
+                        tempBooks.addAll(bookRepo.findAllByTitleContaining(title));
+                    if (books.isEmpty())
+                        books.addAll(tempBooks);
+                    else
+                        books.retainAll(tempBooks);
                 }
                 case "publisher" -> {
+                    Set<Book> tempBooks = new HashSet<>();
                     for (String publisher : entry.getValue())
-                        books.addAll(bookRepo.findAllByPublisherContaining(publisher));
+                        tempBooks.addAll(bookRepo.findAllByPublisherContaining(publisher));
+                    if (books.isEmpty())
+                        books.addAll(tempBooks);
+                    else
+                        books.retainAll(tempBooks);
                 }
                 case "year" -> {
+                    Set<Book> tempBooks = new HashSet<>();
                     for (String year : entry.getValue()){
                         int year_int = Integer.parseInt(year);
-                        books.addAll(bookRepo.findAllByYear(year_int));}
+                        tempBooks.addAll(bookRepo.findAllByYear(year_int));}
+                    if (books.isEmpty())
+                        books.addAll(tempBooks);
+                    else
+                        books.retainAll(tempBooks);
                 }
                 case "genres" -> {
-                    for (String genre : entry.getValue()) {
-                        List<Genre> genres = new ArrayList<>();
-                        Genre g = new Genre(genre);
-                        genres.add(g);
-                        books.addAll(bookRepo.findAllByGenres(genres));
-                    }
+                    Set<Book> tempBooks = new HashSet<>();
+                    for (String genre : entry.getValue())
+                        tempBooks.addAll(getBooksByGenre(genre));
+                    if (books.isEmpty())
+                        books.addAll(tempBooks);
+                    else
+                        books.retainAll(tempBooks);
                 }
                 case "rating" -> {
+                    Set<Book> tempBooks = new HashSet<>();
                     for (String rating : entry.getValue()) {
                         float r = Float.parseFloat(rating);
-                        books.addAll(bookRepo.findAllByRating(r));
+                        tempBooks.addAll(bookRepo.findAllByRating(r));
                     }
+                    if (books.isEmpty())
+                        books.addAll(tempBooks);
+                    else
+                        books.retainAll(tempBooks);
                 }
             }
         }
-        return books;
+        return new ArrayList<>(books);
     }
 
     public int updateBook(UUID id, Book book) {

@@ -1,8 +1,6 @@
 import { Book } from '@/api/get-individual-book';
 export interface Criteria {
-    criteria: {
         [key: string]: string[];
-    };
 }
 
 
@@ -38,6 +36,7 @@ export const searchBooks = async (query: string): Promise<Book[]> => {
 
 export async function fetchBooksByCriteria(criteria: Criteria): Promise<any[]> {
     try {
+        console.log(JSON.stringify({criteria}));
         const response = await fetch(`${API_URL}/criteria`, {
             method: 'POST',
             headers: {

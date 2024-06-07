@@ -116,7 +116,7 @@ public class BookController {
 
     @PostMapping("/criteria")
     public ResponseEntity<List<Book>> getBooksByCriteria(@RequestBody Criteria criteria) {
-        System.out.println("Received criteria: {}"+ criteria);
+        System.out.println("Received criteria: "+ criteria);
         List<Book> books = bookService.getBooksByCriteria(criteria);
         return ResponseEntity.ok(books);
     }
