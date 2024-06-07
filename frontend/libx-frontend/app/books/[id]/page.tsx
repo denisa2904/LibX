@@ -20,6 +20,7 @@ import {
     CarouselPrevious,
 } from "@/components/ui/carousel";
 import { Button } from '@/app/ui/button';
+import CommentsSection from '@/app/ui/books/comments';
 
 interface BookPageProps {
     params: { id: string };
@@ -129,6 +130,10 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
                     <CarouselPrevious />
                     <CarouselNext />
                 </Carousel>
+            </div>
+            <div className="mt-6">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-2">Comments:</h2>
+                <CommentsSection postId={book.id} />
             </div>
         </>
     );

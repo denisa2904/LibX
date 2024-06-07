@@ -48,6 +48,11 @@ public class CommentController {
     public ResponseEntity<?> addComment(@PathVariable("id") UUID id,
                                         @RequestBody CommentHelper commentHelper,
                                         @NonNull HttpServletRequest request){
+        System.out.println();
+        System.out.println();
+        System.out.println(commentHelper.getContent());
+        System.out.println();
+        System.out.println();
         Optional<Book> bookMaybe = bookService.getBookById(id);
         if(bookMaybe.isEmpty())
             return ResponseEntity.status(NOT_FOUND).body("Book not found.");

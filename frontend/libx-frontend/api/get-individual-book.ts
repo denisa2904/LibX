@@ -17,8 +17,17 @@ export interface Book {
 }
 
 export interface Genre {
-    // id: string;
     title: string;
+}
+
+export interface Comments {
+    content: string;
+    username: string;
+    created_at: string;
+}
+
+export interface CommentText {
+    content: string;
 }
 
 const API_URL = 'http://localhost:9000/api/books';
@@ -37,7 +46,7 @@ export const getIndividualBook = async (bookId: string): Promise<Book> => {
 };
 
 export async function fetchImage(bookId: string): Promise<string> {
-    const url = `http://localhost:9000/api/books/${bookId}/image`;
+    const url = `${API_URL}/${bookId}/image`;
 
     try {
         const response = await fetch(url);
@@ -65,5 +74,40 @@ export async function getRecommendedBooks(bookId: string): Promise<Book[]> {
     }
 };
 
-export default getIndividualBook;
+export async function getComments(bookId: string): Promise<Comments[]> {
+    try {
+        const response = await fetch(`${API_URL}/${bookId}/comments`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch comments for book ${bookId}: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to fetch comments:', error);
+        throw error;
+    }
+}
+
+export async function addComment(bookId: string, comment: CommentText): Promise<void> {
+    try {
+        const response = await fetch(`${API_URL}/${bookId}/comments`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(comment)
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to add comment to book ${bookId}: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Failed to add comment:', error);
+        throw error;
+    }
+}
 

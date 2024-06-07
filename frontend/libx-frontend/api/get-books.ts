@@ -18,7 +18,7 @@ export const getBooks = async (): Promise<Book[]> => {
         return books;
     } catch (error) {
         console.error("Failed to fetch books:", error);
-        throw error;  // Rethrowing the error to handle it in the component where this function is called
+        throw error;  
     }
 }
 
@@ -43,7 +43,7 @@ export async function fetchBooksByCriteria(criteria: Criteria): Promise<any[]> {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(criteria),
+            body: JSON.stringify({criteria}),
             credentials: 'include' // Assuming cookies are needed for session management
         });
 
