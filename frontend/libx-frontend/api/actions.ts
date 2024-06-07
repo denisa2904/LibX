@@ -3,10 +3,17 @@ import { Book } from './get-individual-book';
 const API_URL = 'http://localhost:9000/api/users';
 
 export interface User {
+    password: string;
     id: string;
     username: string;
     email: string;
     role: string;
+}
+
+export interface UserUpdate {
+    username?: string;
+    email?: string;
+    password?: string;
 }
 
 const handleResponse = (response: Response) => {
@@ -127,7 +134,10 @@ export const isFavourite = async (bookId : string) => {
 
 export const getUser = async (): Promise<User> => {
     try {
-        const response = await fetch(`${API_URL}/self`);
+        const response = await fetch(`${API_URL}/self`,{
+            method: 'GET',
+            credentials: 'include'
+        });
         if (!response.ok) {
             throw new Error(`Failed to fetch user: ${response.status}`);
         }
@@ -138,10 +148,11 @@ export const getUser = async (): Promise<User> => {
     }
 };
 
-export const updateUser = async (user: User): Promise<User> => {
+export const updateUser = async (user: UserUpdate): Promise<UserUpdate> => {
     try {
         const response = await fetch(`${API_URL}/updateSelf`, {
             method: 'PUT',
+            credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -150,7 +161,7 @@ export const updateUser = async (user: User): Promise<User> => {
         if (!response.ok) {
             throw new Error(`Failed to update user: ${response.status}`);
         }
-        return await response.json() as User;
+        return await response.json() as UserUpdate;
     } catch (error) {
         console.error('Update user error:', error);
         throw error;  

@@ -3,6 +3,7 @@ package org.example.libx.api;
 import jakarta.servlet.http.HttpServletRequest;
 import org.example.libx.model.Book;
 import org.example.libx.model.BookId;
+import org.example.libx.model.RegisterRequest;
 import org.example.libx.model.User;
 import org.example.libx.service.BookService;
 import org.example.libx.service.UserService;
@@ -63,15 +64,15 @@ public class UserController {
         return ResponseEntity.status(OK).body(user);
     }
 
-    @PatchMapping(path = "/updateSelf")
-    public ResponseEntity<?> updateSelf(@NonNull HttpServletRequest request, @RequestBody User user) {
+    @PutMapping(path = "/updateSelf")
+    public ResponseEntity<?> updateSelf(@NonNull HttpServletRequest request, @RequestBody RegisterRequest details) {
         User oldUser = getUser(request);
         if (oldUser == null)
             return ResponseEntity.status(NOT_FOUND).body("User not found");
-        if (user.getEmail() != null)
-            oldUser.setEmail(user.getEmail());
-        if (user.getUsername() != null)
-            oldUser.setUsername(user.getUsername());
+        if (details.getEmail() != null)
+            oldUser.setEmail(details.getEmail());
+        if (details.getUsername() != null)
+            oldUser.setUsername(details.getUsername());
         if (userService.updateUser(oldUser.getId(), oldUser) == 0)
             return ResponseEntity.status(NOT_ACCEPTABLE).body("User not updated");
         return ResponseEntity.status(NO_CONTENT).body("User updated");

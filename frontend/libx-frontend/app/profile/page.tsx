@@ -5,23 +5,22 @@ import { useAuth } from '@/api/auth';
 import { getUser, updateUser } from '@/api/actions';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button'; // Assuming you have a Button component
+import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 
 interface User {
-    id: string;
     username: string;
     email: string;
-    role: string;
+    password: string;
 }
 
 export default function ProfilePage() {
-    const user: User = {
-        id: "1",
-        username: "John Doe",
-        email: "john.doe@yahoo.com",
-        role: "USER"
-    }
+    const [user, setUser] = useState<User>({
+        username: "",
+        email: "",
+        password: "",
+    });
+    const [editable, setEditable] = useState(false);
     const isAuth = useAuth();
 
     if (!isAuth) {
@@ -31,21 +30,27 @@ export default function ProfilePage() {
     useEffect(() => {
         getUser().then((data) => {
             console.log(data);
-            user.username = data.username;
-            user.email = data.email;
-            user.id = data.id;
-            user.role = data.role;
+            setUser({
+                username: data.username,
+                email: data.email,
+                password: data.password
+            });
         });
     }, []);
 
-    const [editable, setEditable] = useState(false);
-
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        updateUser({ ...user, [name]: value });
+        setUser(prev => ({ ...prev, [name]: value }));
     };
 
     const toggleEdit = () => {
+        if (editable) {
+            updateUser(user).then(() => {
+                console.log('User updated');
+            }).catch(error => {
+                console.error('Failed to update user', error);
+            });
+        }
         setEditable(!editable);
     }
 

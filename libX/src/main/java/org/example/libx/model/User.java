@@ -38,7 +38,6 @@ public class User implements UserDetails{
     @Column(name = "hashed_password", nullable = false)
     private String password;
 
-    @Getter
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
     private Role role;
@@ -98,7 +97,7 @@ public class User implements UserDetails{
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
-        return Collections.singletonList(new org.springframework.security.core.authority.SimpleGrantedAuthority(role.name()));
+        return Collections.singletonList(new org.springframework.security.core.authority.SimpleGrantedAuthority(getRole()));
     }
 
     @Override
