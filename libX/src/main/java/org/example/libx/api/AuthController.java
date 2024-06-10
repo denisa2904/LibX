@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 
 @RestController
 @RequestMapping(path = "api/auth")
@@ -33,7 +35,8 @@ public class AuthController {
     @GetMapping(path = "/check")
     public ResponseEntity<String> checkAuth(@NonNull HttpServletRequest request) {
         if (userService.getUsernameFromJwt(request) != null) {
-            User user = userService.getUserByUsername(userService.getUsernameFromJwt(request));
+            String username = userService.getUsernameFromJwt(request);
+            User user = userService.getUserByUsername(username);
             String role = user.getRole();
             return ResponseEntity.status(HttpStatus.OK).body(role);
         } else {

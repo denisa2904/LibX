@@ -6,19 +6,7 @@ import { Pagination } from 'antd';
 import styles from './books.module.css';
 import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
-import { Genre } from '@/api/get-individual-book';
 import { Book } from '@/api/get-individual-book';
-
-export interface Book_with_no_id {
-    title: string;
-    author: string;
-    isbn: string;
-    publisher: string;
-    year: number;
-    description: string;
-    rating: number;
-    genres: Genre[];
-}
 
 const BooksComponent: React.FC = () => {
   const [books, setBooks] = useState<Book[]>([]);
@@ -26,17 +14,6 @@ const BooksComponent: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [booksPerPage] = useState<number>(30);
-  const [newBook, setNewBook] = useState<Book_with_no_id>({
-    title: '',
-    author:'',
-    isbn: '',
-    publisher: '',
-    year: 0,
-    description: '',
-    rating: 0,
-    genres: []
-});
-
   useEffect(() => {
     getRentals()
       .then(books => {

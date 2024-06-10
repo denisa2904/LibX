@@ -5,6 +5,7 @@ import { Heart } from 'lucide-react';
 import { addFavourite, removeFavourite , isFavourite} from '@/api/actions';
 import { useAuth } from '@/api/auth';
 import { deleteBook, updateBook, updateBookPhoto } from '@/api/admin';
+import { getRatings, RatingResponse } from '@/api/get-individual-book';
 import {
     Dialog,
     DialogContent,
@@ -19,6 +20,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 interface IndividualBookProps {
     book: Book;
+    onRatingUpdate?: (newRating: number) => Promise<void>;
 }
 
 const IndividualBook: React.FC<IndividualBookProps> = ({ book }) => {
@@ -27,15 +29,25 @@ const IndividualBook: React.FC<IndividualBookProps> = ({ book }) => {
     const [isFavorited, setIsFavorited] = useState(false); 
     const [editableBook, setEditableBook] = useState<Book>(book);
     const [imageFile, setImageFile] = useState<File | null>(null);
-
+    const [rating, setRating] = useState<RatingResponse>(
+        {
+            rating: 0,
+            numberRatings: 0
+        }
+    );
     useEffect(() => {
         const checkFavoriteStatus = async () => {
             const status = await isFavourite(book.id);
             setIsFavorited(status);
         };
-
+        const fetchRatings = async () => {
+            const rating = await getRatings(book.id);
+            setRating(rating);
+        }
+        fetchRatings();
         checkFavoriteStatus();
     }, [book.id]);
+
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
@@ -197,7 +209,7 @@ const IndividualBook: React.FC<IndividualBookProps> = ({ book }) => {
                     <p className="text-lg text-gray-600 mb-2"><span className="font-semibold text-gray-700">ISBN:</span> {book.isbn}</p>
                     <p className="text-lg text-gray-600 mb-2"><span className="font-semibold text-gray-700">Publisher:</span> {book.publisher}</p>
                     <p className="text-lg text-gray-600 mb-2"><span className="font-semibold text-gray-700">Year:</span> {book.year}</p>
-                    <p className="text-lg text-gray-600 mb-2"><span className="font-semibold text-gray-700">Rating:</span> {book.rating}</p>
+                    <p className="text-lg text-gray-600 mb-2"><span className="font-semibold text-gray-700">Rating:</span> {rating?.rating} from {rating?.numberRatings} ratings</p>
                     <p className="text-lg text-gray-600 mb-2">
                         <span className="font-semibold text-gray-700">Genres:</span> {book.genres.map((genre: Genre) => genre.title).join(', ')}
                     </p>

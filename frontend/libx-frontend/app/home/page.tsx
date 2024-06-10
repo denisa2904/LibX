@@ -41,7 +41,7 @@ export default function HomePage() {
     },
     {
         id: 6,
-        title: 'Mistery',
+        title: 'Mystery',
         image_url: '/mystery.jpg',
 
     }
@@ -83,7 +83,7 @@ export default function HomePage() {
             {genres.map((genre, index) => (
               <CarouselItem key={index} className="pl-1 sm:basis-full md:basis-1/2 lg:basis-1/5">
                 <div className="p-1">
-                  <Link key={genre.id} href={`/books/${genre.title}`} passHref>
+                  <Link key={genre.id} href={`/books/genre/${genre.title}`} passHref>
                     <div className={styles.genreCard}>
                       <Image
                         src={genre.image_url}

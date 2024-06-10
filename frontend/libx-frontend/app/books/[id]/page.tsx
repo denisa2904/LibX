@@ -1,8 +1,8 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import Head from 'next/head';
 import IndividualBook from '@/app/ui/books/individual_book';
-import { getIndividualBook, getRecommendedBooks, Book } from '@/api/get-individual-book';
+import { getIndividualBook, getRecommendedBooks, Book, getRatings, getUserRating, addRating } from '@/api/get-individual-book';
 import NotFound from './not-found';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
@@ -33,6 +33,7 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
     const [loading, setLoading] = useState<boolean>(true);
     const{ isAuthenticated } = useAuth();
     const [isRentedBook, setIsRentedBook] = useState<boolean>(false);
+    const [userRating, setUserRating] = useState<number>(0);
 
     useEffect(() => {
         const loadData = async () => {
@@ -54,10 +55,35 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
             }
         };
 
+        const fetchRatings = async () => {
+            const ratings = await getRatings(params.id);
+            console.log(ratings);
+        }
+
+        fetchRatings();
+
         checkRentedStatus();
 
         loadData();
     }, [params.id, book?.id]);
+
+    useEffect(() => {
+        const fetchUserRating = async () => {
+            if (isAuthenticated) {
+                try {
+                    const rating = await getUserRating(params.id);
+                    setUserRating(rating);
+                } catch (error) {
+                    console.error('Failed to fetch user rating:', error);
+                    setUserRating(0); 
+                }
+            }
+        };
+    
+        if (isAuthenticated) {
+            fetchUserRating();
+        }
+    }, [params.id, isAuthenticated]);
 
     if (loading) {
         return <Skeleton className="w-full h-24" />;
@@ -82,16 +108,26 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
             console.error('Failed to update rental status:', error);
         }
     };
-        
 
-
+    const handleRating = async (rating: number) => {
+        const previousRating = userRating; 
+        setUserRating(rating); 
+        try {
+            await addRating(book.id, rating);
+            console.log('Rating updated successfully');
+        } catch (error) {
+            console.error('Failed to update rating:', error);
+            setUserRating(previousRating); 
+        }
+    };
+    
     return (
         <>
             <Head>
                 <title>{book?.title} - Book Details</title>
                 <meta name="description" content={`Find out more about ${book?.title}, written by ${book?.author}.`} />
             </Head>
-            <IndividualBook book={book} />
+            <IndividualBook book={book} onRatingUpdate={handleRating}/>
             <div className="mt-6"></div>
             {isAuthenticated ? (
                 <Button
@@ -131,6 +167,27 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
                     <CarouselNext />
                 </Carousel>
             </div>
+            {isAuthenticated ?(
+            <div className="mt-6">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-2">Rate this book:</h2>
+                <div className="flex items-center">
+                    <div className="mr-4">Your rating:</div>
+                    <div className="flex items-center">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                                key={star}
+                                onClick={() => handleRating(star)}
+                                className={`text-3xl ${star <= (userRating || 0) ? 'text-popover' : 'text-gray-300'}`}
+                            >
+                                ★
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+
+                
+            </div>) : null}
             <div className="mt-6">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-2">Comments:</h2>
                 <CommentsSection postId={book.id} />

@@ -1,6 +1,7 @@
 package org.example.libx.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @Table(name = "ratings")
 public class Rating {
     @Id
+    @JsonIgnore
     @GenericGenerator(
             name = "rating_sequence",
             strategy = "org.hibernate.id.UUIDGenerator"
@@ -32,6 +34,7 @@ public class Rating {
     private User user;
 
     @ManyToOne
+    @JsonIgnore
     @JoinColumn(name = "book_id", referencedColumnName = "id")
     private Book book;
 

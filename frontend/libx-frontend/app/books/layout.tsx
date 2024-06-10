@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import SideNav from '@/app/ui/home/navbar';
 import styles from '@/app/books/books.module.css'; // Adjust the import path according to your structure
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
+import path from 'path';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
@@ -20,7 +21,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       } else {
         params.delete('q');
       }
-      replace(`${pathname}?${params.toString()}`);
+      replace(`/books?${params.toString()}`);
       setSearchTerm(''); // Clear the input field after search
     }
   };
@@ -37,18 +38,25 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </div>
       <div className="flex flex-col flex-grow">
         <div className={`${styles.searchContainer} bg-gray-100 shadow-md`}>
-          <input
-            type="text"
-            placeholder="Search books"
-            value={searchTerm}
-            onChange={handleInputChange}
-            onKeyPress={handleSearch}
-            className={styles.searchInput}
-          />
-        </div>
-        <div className="flex-grow p-6 overflow-y-auto">
-          {children}
-        </div>
+            <input
+              type="text"
+              placeholder="Search books"
+              value={searchTerm}
+              onChange={handleInputChange}
+              onKeyPress={handleSearch}
+              className={styles.searchInput} />
+              {pathname === '/books' && (
+              <button
+                onClick={() => {/* Implement filter logic */}}
+                className={`${styles.filterButton} ml-2 px-4 py-2 rounded bg-accent text-white hover:bg-primary`}
+              >
+                Filter
+              </button>
+            )}
+          </div>
+          <div className="flex-grow p-6 overflow-y-auto">
+              {children}
+            </div>
       </div>
     </div>
   );

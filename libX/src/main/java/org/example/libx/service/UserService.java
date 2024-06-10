@@ -56,10 +56,6 @@ public class UserService {
         return userRepo.findUserById(id);
     }
 
-    public User getUserByEmail(String email) {
-        return userRepo.findUserByEmail(email).orElse(null);
-    }
-
     public List<User> getAllUsers() {
         return userRepo.findAll();
     }

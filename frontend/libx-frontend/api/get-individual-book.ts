@@ -111,3 +111,64 @@ export async function addComment(bookId: string, comment: CommentText): Promise<
     }
 }
 
+export interface RatingResponse {
+    rating: number;
+    numberRatings: number;
+}
+
+
+export async function getRatings(bookId: string): Promise<RatingResponse> {
+    try {
+        const response = await fetch(`${API_URL}/${bookId}/rating`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch ratings for book ${bookId}: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to fetch ratings:', error);
+        throw error;
+    }
+}
+
+export async function addRating(bookId: string, value: number): Promise<void> {
+    console.log( JSON.stringify({value}));
+    try {
+        const response = await fetch(`${API_URL}/${bookId}/rating/user`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ value })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to add rating to book ${bookId}: ${response.status}`);
+        }
+    } catch (error) {
+        console.error('Failed to add rating:', error);
+        throw error;
+    }
+}
+
+export async function getUserRating(bookId: string): Promise<number> {
+    try {
+        const response = await fetch(`${API_URL}/${bookId}/rating/user`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch user rating for book ${bookId}: ${response.status}`);
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to fetch user rating:', error);
+        throw error;
+    }
+}
+

@@ -57,3 +57,17 @@ export async function fetchBooksByCriteria(criteria: Criteria): Promise<any[]> {
         throw error;
     }
 }
+
+export async function getBooksByGenre(genre: string): Promise<Book[]> {
+    try {
+        const response = await fetch(`${API_URL}/genre/${genre}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const books: Book[] = await response.json();
+        return books;
+    } catch (error) {
+        console.error('Failed to fetch books by genre:', error);
+        throw error;
+    }
+}

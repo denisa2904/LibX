@@ -99,13 +99,24 @@ public class BookService {
     }
 
     public List<Book> getBooksByGenre(String genre) {
-        Optional<Genre> genreOptional = genreRepo.findGenreByTitle(genre);
-        if(genreOptional.isPresent()) {
-            List<Genre> genres = new ArrayList<>();
+        if(genre.contains("_"))
+            genre = genre.replace("_", " ");
+        List<Genre> genres = genreRepo.findAllByTitleContaining(genre);
+        System.out.println();
+        System.out.println();
+        System.out.println(genres);
+        System.out.println();
+        System.out.println();
+        if(genres.isEmpty()) {
+            Optional<Genre> genreOptional = genreRepo.findGenreByTitle(genre);
+            if(genreOptional.isEmpty())
+                return new ArrayList<>();
             genres.add(genreOptional.get());
-            return bookRepo.findAllByGenres(genres);
         }
-        return new ArrayList<>();
+        List<Book> books = new ArrayList<>();
+        for( Genre g : genres)
+            books.addAll(bookRepo.findAllByGenres(Collections.singletonList(g)));
+        return books;
     }
     public List<Book> getBooksByRating(float rating) {
         return bookRepo.findAllByRating(rating);
@@ -142,7 +153,7 @@ public class BookService {
         }
 }
     * */
-    public List<Book> getBooksByCriteria(Criteria criteria){
+    public Set<Book> getBooksByCriteria(Criteria criteria){
         Set<Book> books = new HashSet<>();
         Map<String, List<String>> criteriaMap;
         criteriaMap = criteria.getCriteria();
@@ -207,7 +218,7 @@ public class BookService {
                 }
             }
         }
-        return new ArrayList<>(books);
+        return books;
     }
 
     public int updateBook(UUID id, Book book) {

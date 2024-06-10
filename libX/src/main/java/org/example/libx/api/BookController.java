@@ -6,6 +6,7 @@ import org.example.libx.model.Criteria;
 import org.example.libx.model.Image;
 import org.example.libx.service.BookService;
 import org.example.libx.service.ImageService;
+import org.example.libx.service.RatingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,10 +18,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.Optional;
+import java.util.*;
 
 import static org.springframework.http.HttpStatus.*;
 
@@ -32,11 +30,14 @@ public class BookController {
     private final ImageService imageService;
     private final FirebaseStorageStrategy firebaseStorageStrategy;
 
+    private final RatingService ratingService;
+
     @Autowired
-    public BookController(BookService bookService, ImageService imageService, FirebaseStorageStrategy firebaseStorageStrategy) {
+    public BookController(BookService bookService, ImageService imageService, FirebaseStorageStrategy firebaseStorageStrategy, RatingService ratingService) {
         this.bookService = bookService;
         this.imageService = imageService;
         this.firebaseStorageStrategy = firebaseStorageStrategy;
+        this.ratingService = ratingService;
     }
 
     @GetMapping
@@ -50,34 +51,35 @@ public class BookController {
         if(bookMaybe.isEmpty())
             return ResponseEntity.status(NOT_FOUND).body("Book not found.".getBytes());
         Book book = bookMaybe.get();
-        System.out.println(book);
+        book.setRating(ratingService.getAverageRating(id).getRating());
+        bookService.updateBook(book.getId(), book);
         return ResponseEntity.status(OK).body(book);
     }
 
     @GetMapping("author/{author}")
-    public List<Book> getBooksByAuthor(@PathVariable("author") String author) {
-        return bookService.getBooksByAuthor(author);
+    public Set<Book> getBooksByAuthor(@PathVariable("author") String author) {
+        return new HashSet<>(bookService.getBooksByAuthor(author));
     }
 
     @GetMapping("publisher/{publisher}")
-    public List<Book> getBooksByPublisher(@PathVariable("publisher") String publisher) {
-        return bookService.getBooksByPublisher(publisher);
+    public Set<Book> getBooksByPublisher(@PathVariable("publisher") String publisher) {
+        return new HashSet<>(bookService.getBooksByPublisher(publisher));
     }
 
     @GetMapping("year/{year}")
-    public List<Book> getBooksByYear(@PathVariable("year") int year) {
-        return bookService.getBooksByYear(year);
+    public Set<Book> getBooksByYear(@PathVariable("year") int year) {
+        return new HashSet<>(bookService.getBooksByYear(year));
     }
 
     @GetMapping("genre/{genre}")
-    public List<Book> getBooksByGenre(@PathVariable("genre") String genre) {
-        return bookService.getBooksByGenre(genre);
+    public Set<Book> getBooksByGenre(@PathVariable("genre") String genre) {
+        return new HashSet<>(bookService.getBooksByGenre(genre));
     }
 
     @GetMapping("/search")
-    public List<Book> getBooksBySearch(@RequestParam("q") String search) {
+    public Set<Book> getBooksBySearch(@RequestParam("q") String search) {
         System.out.println("Searching for books with: " + search);
-        return bookService.getBooksBySearch(search);
+        return new HashSet<>(bookService.getBooksBySearch(search));
     }
 
     @GetMapping("{id}/image")
@@ -115,10 +117,8 @@ public class BookController {
     }
 
     @PostMapping("/criteria")
-    public ResponseEntity<List<Book>> getBooksByCriteria(@RequestBody Criteria criteria) {
-        System.out.println("Received criteria: "+ criteria);
-        List<Book> books = bookService.getBooksByCriteria(criteria);
-        return ResponseEntity.ok(books);
+    public ResponseEntity<Set<Book>> getBooksByCriteria(@RequestBody Criteria criteria) {
+        return ResponseEntity.ok(bookService.getBooksByCriteria(criteria));
     }
 
 

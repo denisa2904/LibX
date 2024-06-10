@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface GenreRepo extends JpaRepository<Genre, UUID> {
 
-    List<Genre> findAllByTitleContaining(String genre);
     Optional<Genre> findGenreByTitle(String title);
+    List<Genre> findAllByTitleContaining(String title);
 
 }
