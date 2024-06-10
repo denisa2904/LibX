@@ -52,7 +52,6 @@ const BooksComponent: React.FC = () => {
     const fetchBooks = async () => {
       setLoading(true);
       try {
-        // Choose which function to call based on the presence of a query
         const fetchedBooks = query ? await searchBooks(query) : await getBooks();
         setBooks(fetchedBooks);
       } catch (error) {
@@ -173,7 +172,7 @@ const handleAddBook = async () => {
                                             <textarea
                                                 id="description"
                                                 name="description"
-                                                className="col-span-3 h-32 p-2 border rounded-md" // Set height, padding, border, and rounding as needed
+                                                className="col-span-3 h-32 p-2 border rounded-md" 
                                                 value={newBook.description}
                                                 onChange={handleInputChange}
                                             />

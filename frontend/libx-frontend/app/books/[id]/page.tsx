@@ -108,18 +108,6 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
             console.error('Failed to update rental status:', error);
         }
     };
-
-    const handleRating = async (rating: number) => {
-        const previousRating = userRating; 
-        setUserRating(rating); 
-        try {
-            await addRating(book.id, rating);
-            console.log('Rating updated successfully');
-        } catch (error) {
-            console.error('Failed to update rating:', error);
-            setUserRating(previousRating); 
-        }
-    };
     
     return (
         <>
@@ -127,7 +115,7 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
                 <title>{book?.title} - Book Details</title>
                 <meta name="description" content={`Find out more about ${book?.title}, written by ${book?.author}.`} />
             </Head>
-            <IndividualBook book={book} onRatingUpdate={handleRating}/>
+            <IndividualBook params={params}/>
             <div className="mt-6"></div>
             {isAuthenticated ? (
                 <Button
@@ -167,27 +155,6 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
                     <CarouselNext />
                 </Carousel>
             </div>
-            {isAuthenticated ?(
-            <div className="mt-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-2">Rate this book:</h2>
-                <div className="flex items-center">
-                    <div className="mr-4">Your rating:</div>
-                    <div className="flex items-center">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                            <button
-                                key={star}
-                                onClick={() => handleRating(star)}
-                                className={`text-3xl ${star <= (userRating || 0) ? 'text-popover' : 'text-gray-300'}`}
-                            >
-                                ★
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-
-                
-            </div>) : null}
             <div className="mt-6">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-2">Comments:</h2>
                 <CommentsSection postId={book.id} />

@@ -18,7 +18,6 @@ import java.util.*;
 public class BookService {
     private final BookRepo bookRepo;
     private final CommentRepo commentRepo;
-    private final ImageRepo imageRepo;
 
     private final ImageService imageService;
     private final RatingRepo ratingRepo;
@@ -31,10 +30,9 @@ public class BookService {
 
 
     @Autowired
-    public BookService(BookRepo bookRepo, CommentRepo commentRepo, ImageRepo imageRepo, RatingRepo ratingRepo, UserRepo userRepo, GenreRepo genreRepo, ImageService imageService) {
+    public BookService(BookRepo bookRepo, CommentRepo commentRepo, RatingRepo ratingRepo, UserRepo userRepo, GenreRepo genreRepo, ImageService imageService) {
         this.bookRepo = bookRepo;
         this.commentRepo = commentRepo;
-        this.imageRepo = imageRepo;
         this.ratingRepo = ratingRepo;
         this.userRepo = userRepo;
         this.genreRepo = genreRepo;
@@ -148,7 +146,6 @@ public class BookService {
     "criteria": {
             "author":["Tolstoy"],
             "year":["2021"],
-            "title":["Anna"],
             "genres":["Fiction"]
         }
 }
@@ -285,5 +282,33 @@ public class BookService {
         return 1;
     }
 
+    public List<String> getGenres() {
+        List<Genre> genres = genreRepo.findAll();
+        List<String> genreTitles = new ArrayList<>();
+        for (Genre genre : genres)
+        {
+            genreTitles.add(genre.getTitle());
+        }
+        return genreTitles;
+    }
 
+    public List<String> getAuthors() {
+        List<Book> books = bookRepo.findAll();
+        Set<String> authors = new HashSet<>();
+        for (Book book : books)
+            if(bookRepo.findAllByAuthor(book.getAuthor()).size() > 5){
+            authors.add(book.getAuthor());
+        }
+        return new ArrayList<>(authors);
+    }
+
+    public List<String> getPublishers() {
+        List<Book> books = bookRepo.findAll();
+        Set<String> publishers = new HashSet<>();
+        for (Book book : books)
+            if(bookRepo.findAllByPublisher(book.getPublisher()).size() > 5){
+            publishers.add(book.getPublisher());
+        }
+        return new ArrayList<>(publishers);
+    }
 }

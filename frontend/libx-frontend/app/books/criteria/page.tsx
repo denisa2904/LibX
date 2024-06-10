@@ -6,19 +6,8 @@ import { Pagination } from 'antd';
 import styles from '@/app/books/books.module.css';
 import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
-import { Genre } from '@/api/get-individual-book';
 import { Book } from '@/api/get-individual-book';
 
-export interface Book_with_no_id {
-    title: string;
-    author: string;
-    isbn: string;
-    publisher: string;
-    year: number;
-    description: string;
-    rating: number;
-    genres: Genre[];
-}
 
 const BooksComponent: React.FC = () => {
   const [books, setBooks] = useState<Book[]>([]);
@@ -27,8 +16,8 @@ const BooksComponent: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [booksPerPage] = useState<number>(30);
   const initialCriteria: Criteria = {
-    author: ["J.K. Rowling"], 
-    title: ["Harry Potter"]
+    author: ["J.K. Rowling"],
+    genre: ["Fantasy"]
   };
   const [criteria, setCriteria] = useState<Criteria>(initialCriteria);
   useEffect(() => {

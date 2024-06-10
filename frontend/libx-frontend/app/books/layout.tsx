@@ -1,34 +1,83 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SideNav from '@/app/ui/home/navbar';
-import styles from '@/app/books/books.module.css'; // Adjust the import path according to your structure
+import { fetchAuthors, fetchGenres, fetchPublishers, fetchBooksByCriteria } from '@/api/get-books';
+import styles from '@/app/books/books.module.css';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
-import path from 'path';
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogClose
+} from '@/components/ui/dialog';
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
-  const [searchTerm, setSearchTerm] = useState(''); // State to hold the search term
+  const [searchTerm, setSearchTerm] = useState(''); 
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [authors, setAuthors] = useState<string[]>([]);
+  const [genres, setGenres] = useState<string[]>([]);
+  const [publishers, setPublishers] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (isDialogOpen) {
+      const fetchData = async () => {
+        try {
+          const authorsData = await fetchAuthors();
+          const genresData = await fetchGenres();   
+          const publishersData = await fetchPublishers(); 
+          setAuthors(authorsData);
+          setGenres(genresData);
+          setPublishers(publishersData);
+        } catch (error) {
+          console.error('Error fetching filter data:', error);
+        }
+      };
+      fetchData();
+    }
+  }, [isDialogOpen]);
+
+  const openDialog = () => setIsDialogOpen(true);
+  const closeDialog = () => setIsDialogOpen(false);
 
   const handleSearch = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
       const term = (event.target as HTMLInputElement).value;
       const params = new URLSearchParams(searchParams);
       if (term) {
-        console.log(`Searching for ${term}`);
         params.set('q', term);
+        console.log(`Searching for ${term}`);
       } else {
         params.delete('q');
       }
       replace(`/books?${params.toString()}`);
-      setSearchTerm(''); // Clear the input field after search
+      setSearchTerm('');
     }
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const inputElement = event.target as HTMLInputElement;
-    setSearchTerm(inputElement.value); // Update searchTerm state on every change
+    setSearchTerm(event.target.value);
+  };
+
+  const handleFilterSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const criteria = {
+      author: [formData.get('author') as string],
+      genre: [formData.get('genre') as string],
+      publisher: [formData.get('publisher') as string]
+    };
+    try {
+      const filteredBooks = await fetchBooksByCriteria(criteria);
+      console.log('Filtered Books:', filteredBooks);
+    } catch (error) {
+      console.error('Error applying filters:', error);
+    }
+    closeDialog();
   };
 
   return (
@@ -38,25 +87,69 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </div>
       <div className="flex flex-col flex-grow">
         <div className={`${styles.searchContainer} bg-gray-100 shadow-md`}>
-            <input
-              type="text"
-              placeholder="Search books"
-              value={searchTerm}
-              onChange={handleInputChange}
-              onKeyPress={handleSearch}
-              className={styles.searchInput} />
-              {pathname === '/books' && (
+          <input
+            type="text"
+            placeholder="Search books"
+            value={searchTerm}
+            onChange={handleInputChange}
+            onKeyPress={handleSearch}
+            className={styles.searchInput}
+          />
+          {pathname === '/books' && (
+            <>
               <button
-                onClick={() => {/* Implement filter logic */}}
+                onClick={openDialog}
                 className={`${styles.filterButton} ml-2 px-4 py-2 rounded bg-accent text-white hover:bg-primary`}
               >
                 Filter
               </button>
-            )}
-          </div>
-          <div className="flex-grow p-6 overflow-y-auto">
-              {children}
-            </div>
+              <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogContent>
+                <DialogTitle>Filter Books</DialogTitle>
+                <DialogDescription>
+                  Adjust the filters to refine your search results.
+                </DialogDescription>
+                <form onSubmit={handleFilterSubmit}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    <div>
+                      <label htmlFor="author-select">Author:</label>
+                      <select id="author-select" name="author">
+                        {authors.map(author => (
+                          <option key={author} value={author}>{author}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label htmlFor="genre-select">Genre:</label>
+                      <select id="genre-select" name="genre">
+                        {genres.map(genre => (
+                          <option key={genre} value={genre}>{genre}</option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label htmlFor="publisher-select">Publisher:</label>
+                      <select id="publisher-select" name="publisher">
+                        {publishers.map(publisher => (
+                          <option key={publisher} value={publisher}>{publisher}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <button type="submit">Apply Filters</button>
+                </form>
+              </DialogContent>
+            </Dialog>
+
+            </>
+          )}
+        </div>
+        <div className="flex-grow p-6 overflow-y-auto">
+          {children}
+        </div>
       </div>
     </div>
   );

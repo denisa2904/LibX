@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Book, Genre } from '@/api/get-individual-book';  
+import { Book, fetchImage} from '@/api/get-individual-book';  
 import BookImage from './book_image'; 
 import { Heart } from 'lucide-react';
 import { addFavourite, removeFavourite , isFavourite} from '@/api/actions';
 import { useAuth } from '@/api/auth';
 import { deleteBook, updateBook, updateBookPhoto } from '@/api/admin';
-import { getRatings, RatingResponse } from '@/api/get-individual-book';
+import { getRatings, RatingResponse, addRating, getUserRating } from '@/api/get-individual-book';
+import { getIndividualBook } from '@/api/get-individual-book';
 import {
     Dialog,
     DialogContent,
@@ -14,20 +15,26 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
+    DialogClose
   } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
+import styles from '@/app/books/books.module.css';
+import { notification } from 'antd';
+import type { ArgsProps } from 'antd/lib/notification';
+import { NotificationPlacement } from 'antd/lib/notification/interface';
+
 interface IndividualBookProps {
-    book: Book;
-    onRatingUpdate?: (newRating: number) => Promise<void>;
+    params: { id: string };
 }
 
-const IndividualBook: React.FC<IndividualBookProps> = ({ book }) => {
+const IndividualBook: React.FC<IndividualBookProps> = ({ params }) => {
+    const [book, setBook] = useState<Book | null>(null);
+    const [editableBook, setEditableBook] = useState<Book | undefined>();
     const { isAuthenticated } = useAuth();
     const { role } = useAuth();
     const [isFavorited, setIsFavorited] = useState(false); 
-    const [editableBook, setEditableBook] = useState<Book>(book);
     const [imageFile, setImageFile] = useState<File | null>(null);
     const [rating, setRating] = useState<RatingResponse>(
         {
@@ -35,80 +42,151 @@ const IndividualBook: React.FC<IndividualBookProps> = ({ book }) => {
             numberRatings: 0
         }
     );
+    const [userRating, setUserRating] = useState<number>(0);
+    type NotificationType = 'success' | 'info' | 'warning' | 'error';
+    const showNotification = (type:NotificationType , message:string, placement: NotificationPlacement = 'topRight') => {
+        const displayTitle = type.charAt(0).toUpperCase() + type.slice(1);
+        const config: ArgsProps = {
+            message: displayTitle,
+            description: message,
+            placement,
+        };
+        notification[type](config);
+      };
+      
+
     useEffect(() => {
+        const getIndividualBookData = async () => {
+            const bookData = await getIndividualBook(params.id);
+            setBook(bookData);
+        }
         const checkFavoriteStatus = async () => {
-            const status = await isFavourite(book.id);
+            const status = await isFavourite(params.id);
             setIsFavorited(status);
         };
         const fetchRatings = async () => {
-            const rating = await getRatings(book.id);
+            const rating = await getRatings(params.id);
             setRating(rating);
         }
+        getIndividualBookData();
         fetchRatings();
         checkFavoriteStatus();
-    }, [book.id]);
+    }, [params.id]);
+
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                const bookData = await getIndividualBook(params.id);
+                setBook(bookData);
+                setEditableBook(bookData);
+                const status = await isFavourite(params.id);
+                setIsFavorited(status);
+                const ratings = await getRatings(params.id);
+                setRating(ratings);
+                if (isAuthenticated) {
+                    const userRate = await getUserRating(params.id);
+                    setUserRating(userRate);
+                }
+            } catch (error) {
+                console.error('Initialization error:', error);
+            }
+        }
+        fetchData();
+    }, [params.id, isAuthenticated]);
 
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target;
-        if (name === 'genres') {
-            const genresArray = value.split(',').map((genre, index) => ({
-                title: genre.trim()
-            }));
-            setEditableBook({ ...editableBook, genres: genresArray });
-        } else {
-            setEditableBook({ ...editableBook, [name]: value });
-        }
+        setEditableBook((prev: Book | undefined) => ({ ...prev, [name]: value } as Book));
     };
     
     const handleEditBook = async () => {
-        if (await updateBook(editableBook)) {
-            alert("Book updated successfully!");
-            window.location.reload();
-        } else {
-            alert("Failed to update the book.");
+        if (!editableBook) return;
+
+        try {
+            if (await updateBook(editableBook)) {
+                showNotification('success', 'Book updated successfully!');
+                setBook(editableBook); 
+            } else {
+                showNotification('error', 'Failed to update book.');
+            }
+        } catch (error) {
+            showNotification('error', 'Failed to update book.');
+            console.error('Update error:', error);
+        }
+    };
+      
+    const updateImage = async () => {
+        if (!imageFile) {
+            showNotification('error', 'Please select an image to upload.');
+            return;
+        }
+        try {
+            const newImageUrl = await updateBookPhoto(params.id, imageFile);
+            if (newImageUrl) {
+                showNotification('success', 'Image updated successfully!');
+                setBook(prevBook => {
+                    if (prevBook === null) return null;
+                    return { ...prevBook, imageUrl: newImageUrl };
+                });
+            } else {
+                showNotification('error', 'Failed to update image.');
+            }
+        } catch (error) {
+            showNotification('error', 'Failed to update image.');
+            console.error('Image update error:', error);
         }
     };
     
-    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files && event.target.files[0]) {
-            setImageFile(event.target.files[0]);
+    
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (files) {
+            setImageFile(files[0]);
+            return true;
         }
+        return false;
     };
-    const updateImage = async () => {
-        if (!imageFile) {
-            alert("Please select an image file first.");
-            return;
-        }
-        const success = await updateBookPhoto(book.id, imageFile);
-        if (success) {
-            alert("Image updated successfully!");
-            window.location.reload();
-        } else {
-            alert("Failed to update image.");
-        }
-    };
+      
 
     const toggleFavorite = () => {
         if (isFavorited) {
             setIsFavorited(!isFavorited);
-            removeFavourite(book.id);
+            removeFavourite(params.id);
         }
         else {
             setIsFavorited(!isFavorited);
-            addFavourite(book.id);
+            addFavourite(params.id);
         }
     };
+
+    const handleRating = async (newRating: number) => {
+        const previousUserRating = userRating;
+        setUserRating(newRating); 
+    
+        try {
+            await addRating(params.id, newRating); 
+            const updatedRatings = await getRatings(params.id); 
+            setRating(updatedRatings); 
+            console.log('Rating updated successfully');
+        } catch (error) {
+            console.error('Failed to update rating:', error);
+            setUserRating(previousUserRating); 
+        }
+    };
+    
 
     return (
         <div className="p-6 rounded-lg shadow-lg">
             <div className="flex flex-col md:flex-row gap-6">
                 <div className="flex justify-center items-center">
-                    <BookImage bookId={book.id} className="w-full h-full object-cover rounded-md" />
+                    <BookImage bookId={params.id} onUpdate={handleImageChange} className="w-full h-full object-cover rounded-md" />
                 </div>
                 <div className="md:w-2/3 flex flex-col">
                     <div className="flex">
-                        <h1 className="text-3xl font-bold text-gray-800 mb-4">{book.title}</h1>
+                        <h1 className="text-3xl font-bold text-gray-800 mb-4">{book?.title}</h1>
                         <div className="flex">
                             {isAuthenticated ?(
                             <Heart
@@ -142,31 +220,31 @@ const IndividualBook: React.FC<IndividualBookProps> = ({ book }) => {
                                         <Label htmlFor="title" className="text-right">
                                         Title
                                         </Label>
-                                        <Input id="title" name="title" type="text" value={editableBook.title} onChange={handleInputChange} className="col-span-3" />
+                                        <Input id="title" name="title" type="text" value={editableBook?.title} onChange={handleInputChange} className="col-span-3" />
                                     </div>
                                     <div className="grid grid-cols-4 items-center gap-4">
                                         <Label htmlFor="author" className="text-right">
                                         Author
                                         </Label>
-                                        <Input id="author" name="author" type="text" value={editableBook.author} onChange={handleInputChange} className="col-span-3" />
+                                        <Input id="author" name="author" type="text" value={editableBook?.author} onChange={handleInputChange} className="col-span-3" />
                                     </div>
                                     <div className="grid grid-cols-4 items-center gap-4">
                                         <Label htmlFor="isbn" className="text-right">
                                         ISBN
                                         </Label>
-                                        <Input id="isbn" name="isbn" type="text" value={editableBook.isbn} onChange={handleInputChange} className="col-span-3" />
+                                        <Input id="isbn" name="isbn" type="text" value={editableBook?.isbn} onChange={handleInputChange} className="col-span-3" />
                                     </div>
                                     <div className="grid grid-cols-4 items-center gap-4">
                                         <Label htmlFor="publisher" className="text-right">
                                         Publisher
                                         </Label>
-                                        <Input id="publisher" name="publisher" type="text" value={editableBook.publisher} onChange={handleInputChange} className="col-span-3" />
+                                        <Input id="publisher" name="publisher" type="text" value={editableBook?.publisher} onChange={handleInputChange} className="col-span-3" />
                                     </div>
                                     <div className="grid grid-cols-4 items-center gap-4">
                                         <Label htmlFor="year" className="text-right">
                                         Year
                                         </Label>
-                                        <Input id="year" name ="year" type="text" value={editableBook.year} onChange={handleInputChange} className="col-span-3" />
+                                        <Input id="year" name ="year" type="text" value={editableBook?.year} onChange={handleInputChange} className="col-span-3" />
                                     </div>
                                     <div className="grid grid-cols-4 items-center gap-4">
                                         <Label htmlFor="genres" className="text-right">
@@ -176,7 +254,7 @@ const IndividualBook: React.FC<IndividualBookProps> = ({ book }) => {
                                             id="genres"
                                             name="genres"
                                             type="text"
-                                            value={editableBook.genres.map(genre => genre.title).join(', ')}
+                                            value={editableBook?.genres.map(genre => genre.title).join(', ')}
                                             onChange={handleInputChange}
                                             className="col-span-3"
                                         />
@@ -188,36 +266,69 @@ const IndividualBook: React.FC<IndividualBookProps> = ({ book }) => {
                                                 id="description"
                                                 name="description"
                                                 className="col-span-3 h-32 p-2 border rounded-md" // Set height, padding, border, and rounding as needed
-                                                value={editableBook.description}
+                                                value={editableBook?.description}
                                                 onChange={handleInputChange}
                                             />
                                         </div>
                                     </div>
                                     <DialogFooter>
-                                    <Button onClick={updateImage}>Upload Image</Button>
-                                    <Button onClick={handleEditBook}>Save Changes</Button>
+                                    <DialogClose asChild>
+                                        <Button onClick={updateImage}>Upload Image</Button>
+                                    </DialogClose>
+                                    <DialogClose asChild>
+                                        <Button onClick={handleEditBook}>Save Changes</Button>
+                                    </DialogClose>
                                     </DialogFooter>
                                 </DialogContent>
                             </Dialog>
                             <button className="bg-red-500 text-white px-4 py-2 rounded"
-                            onClick={() => deleteBook(book.id).then(() => window.location.replace('/books'))}
+                            onClick={() => deleteBook(params.id).then(() => window.location.replace('/books'))}
                             >Delete</button>
                             </div>) : null}
                         </div>
                     </div>
-                    <p className="text-lg text-gray-600 mb-2"><span className="font-semibold text-gray-700">Author:</span> {book.author}</p>
-                    <p className="text-lg text-gray-600 mb-2"><span className="font-semibold text-gray-700">ISBN:</span> {book.isbn}</p>
-                    <p className="text-lg text-gray-600 mb-2"><span className="font-semibold text-gray-700">Publisher:</span> {book.publisher}</p>
-                    <p className="text-lg text-gray-600 mb-2"><span className="font-semibold text-gray-700">Year:</span> {book.year}</p>
-                    <p className="text-lg text-gray-600 mb-2"><span className="font-semibold text-gray-700">Rating:</span> {rating?.rating} from {rating?.numberRatings} ratings</p>
-                    <p className="text-lg text-gray-600 mb-2">
-                        <span className="font-semibold text-gray-700">Genres:</span> {book.genres.map((genre: Genre) => genre.title).join(', ')}
-                    </p>
+                    <div className={styles.text_detail}>
+                        <span className={styles.font_bold_detail}>Author:</span> {book?.author}
+                    </div>
+                    <div className={styles.text_detail}>
+                        <span className={styles.font_bold_detail}>ISBN:</span> {book?.isbn}
+                    </div>
+                    <div className={styles.text_detail}>
+                        <span className={styles.font_bold_detail}>Publisher:</span> {book?.publisher}
+                    </div>
+                    <div className={styles.text_detail}>
+                        <span className={styles.font_bold_detail}>Year:</span> {book?.year}
+                    </div>
+                    <div className={styles.text_detail}>
+                        <span className={styles.font_bold_detail}>Average Rating:</span> {rating?.rating} from {rating?.numberRatings} ratings
+                    </div>
+                    {isAuthenticated && (
+                        <div className={styles.text_detail}>
+                            <div className="flex items-center">
+                                <span className={styles.font_bold_detail}>Your rating:</span>
+                                <div className="flex items-center ml-2">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <button
+                                            key={star}
+                                            onClick={() => handleRating(star)}
+                                            className={`text-3xl ${star <= (userRating || 0) ? 'text-yellow-500' : 'text-gray-300'}`}
+                                        >
+                                            ★
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    <div className={styles.text_detail}>
+                        <span className={styles.font_bold_detail}>Genres:</span> {book?.genres.map(genre => genre.title).join(', ')}
+                    </div>
+                        
                 </div>
             </div>
             <div className="mt-6">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-2">Description</h2>
-                <p className="text-lg text-gray-600">{book.description}</p>
+                <p className="text-lg text-gray-600">{book?.description}</p>
             </div>
         </div>
     );

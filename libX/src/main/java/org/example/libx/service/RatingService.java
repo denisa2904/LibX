@@ -35,7 +35,10 @@ public class RatingService {
         }
         if(ratings.isEmpty())
             return new RatingResponse(0, 0);
-        return new RatingResponse((float) (sum / ratings.size()), ratings.size());
+        float result = (float) (sum / ratings.size());
+        // make sure to round to 2 decimal places
+        result = Math.round(result * 100.0) / 100.0f;
+        return new RatingResponse(result, ratings.size());
     }
 
     public int getRatingByBookIdAndUserId(UUID bookId, UUID userId) {

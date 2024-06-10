@@ -156,5 +156,19 @@ public class BookController {
         return ResponseEntity.status(NOT_ACCEPTABLE).body("Image is invalid.".getBytes());
     }
 
+    @GetMapping("authors")
+    public List<String> getAuthors() {
+        return bookService.getAuthors();
+    }
+
+    @GetMapping("publishers")
+    public List<String> getPublishers() {
+        return bookService.getPublishers();
+    }
+
+    @GetMapping("genres")
+    public List<String> getGenres() {
+        return bookService.getGenres();
+    }
 
 }

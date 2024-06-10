@@ -43,7 +43,7 @@ export async function fetchBooksByCriteria(criteria: Criteria): Promise<any[]> {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({criteria}),
-            credentials: 'include' // Assuming cookies are needed for session management
+            credentials: 'include' 
         });
 
         if (!response.ok) {
@@ -68,6 +68,45 @@ export async function getBooksByGenre(genre: string): Promise<Book[]> {
         return books;
     } catch (error) {
         console.error('Failed to fetch books by genre:', error);
+        throw error;
+    }
+}
+
+export async function fetchAuthors(): Promise<string[]> {
+    try {
+        const response = await fetch(`${API_URL}/authors`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to fetch authors:', error);
+        throw error;
+    }
+}
+
+export async function fetchGenres(): Promise<string[]> {
+    try {
+        const response = await fetch(`${API_URL}/genres`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to fetch genres:', error);
+        throw error;
+    }
+}
+
+export async function fetchPublishers(): Promise<string[]> {
+    try {
+        const response = await fetch(`${API_URL}/publishers`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to fetch publishers:', error);
         throw error;
     }
 }

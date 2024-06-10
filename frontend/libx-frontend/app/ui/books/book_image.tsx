@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { fetchImage } from '@/api/get-individual-book';  
 import { Skeleton } from "@/components/ui/skeleton"
 
-const BookImage: React.FC<{ bookId: string; className?: string }> = ({ bookId, className }) => {
+const BookImage: React.FC<{ bookId: string; onUpdate?:(e: React.ChangeEvent<HTMLInputElement>) => boolean ; className?: string }> = ({ bookId, className }) => {
     const [imageUrl, setImageUrl] = useState<string>('');
 
     useEffect(() => {

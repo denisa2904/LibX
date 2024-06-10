@@ -138,3 +138,15 @@
   border-color: #666; /* Changes border color on focus */
   box-shadow: 0 2px 8px rgba(0,0,0,0.2); /* Darker shadow on focus */
 }
+
+/* Assuming you use Tailwind CSS based on your class naming conventions */
+.text_detail {
+  color: #4B5563; /* Gray-600 */
+  margin-bottom: 0.5rem; /* mb-2 */
+  font-size: 1.125rem; /* text-lg */
+}
+
+.font_bold_detail {
+  font-weight: bold; /* font-semibold */
+  color: #374151; /* Gray-700 */
+}
