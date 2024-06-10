@@ -2,7 +2,7 @@
 import React, { use, useEffect, useState } from 'react';
 import Head from 'next/head';
 import IndividualBook from '@/app/ui/books/individual_book';
-import { getIndividualBook, getRecommendedBooks, Book, getRatings, getUserRating, addRating } from '@/api/get-individual-book';
+import { getIndividualBook, getRecommendedBooks, Book, getRatings, getUserRating} from '@/api/get-individual-book';
 import NotFound from './not-found';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent } from '@/components/ui/card';
@@ -155,8 +155,8 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
                     <CarouselNext />
                 </Carousel>
             </div>
-            <div className="mt-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-2">Comments:</h2>
+            <div className=" mt-6 p-6 rounded-lg shadow-lg">
+                <h2 className="text-2xl font-semibold text-gray-800 mb-2 ">Comments:</h2>
                 <CommentsSection postId={book.id} />
             </div>
         </>

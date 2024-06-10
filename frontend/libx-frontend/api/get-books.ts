@@ -36,7 +36,7 @@ export const searchBooks = async (query: string): Promise<Book[]> => {
 
 export async function fetchBooksByCriteria(criteria: Criteria): Promise<any[]> {
     try {
-        console.log(JSON.stringify({criteria}));
+        console.log('This',JSON.stringify({criteria}));
         const response = await fetch(`${API_URL}/criteria`, {
             method: 'POST',
             headers: {
@@ -50,7 +50,6 @@ export async function fetchBooksByCriteria(criteria: Criteria): Promise<any[]> {
             const message = `An error has occurred: ${response.status} - ${response.statusText}`;
             throw new Error(message);
         }
-
         return await response.json();
     } catch (error) {
         console.error('Failed to fetch books by criteria:', error);

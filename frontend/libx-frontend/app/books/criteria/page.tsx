@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import { Criteria, fetchBooksByCriteria} from '@/api/get-books';
 import BookImage from '@/app/ui/books/book_image';
 import { Pagination } from 'antd';
@@ -15,21 +15,28 @@ const BooksComponent: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [booksPerPage] = useState<number>(30);
-  const initialCriteria: Criteria = {
-    author: ["J.K. Rowling"],
-    genre: ["Fantasy"]
-  };
-  const [criteria, setCriteria] = useState<Criteria>(initialCriteria);
+  const [criteria, setCriteria] = useState<Criteria>(
+    {
+      rating: ['']
+    }
+  );
+
   useEffect(() => {
-    setLoading(true);
+    const storedCriteria = localStorage.getItem('searchCriteria');
+    if (storedCriteria) {
+      setCriteria(JSON.parse(storedCriteria));
+      localStorage.removeItem('searchCriteria');
+    }
+  }, []);
+
+  useEffect(() => {
     fetchBooksByCriteria(criteria)
       .then(books => {
         setBooks(books);
         setLoading(false);
       })
       .catch(error => {
-        console.error('Error fetching books:', error);
-        setError('Failed to load books.');
+        setError('Failed to fetch books');
         setLoading(false);
       });
   }, [criteria]);
@@ -37,7 +44,7 @@ const BooksComponent: React.FC = () => {
   const indexOfLastBook = currentPage * booksPerPage;
   const indexOfFirstBook = indexOfLastBook - booksPerPage;
   const currentBooks = books.slice(indexOfFirstBook, indexOfLastBook);
-
+  console.log('boooooooks:', books);
   const onPageChange = (page: number) => {
     setCurrentPage(page);
   };

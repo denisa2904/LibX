@@ -7,7 +7,7 @@ import { getComments, addComment } from '@/api/get-individual-book'; // Ensure c
 export interface Comments {
     content: string;
     username: string;
-    created_at: string;
+    createdAt: string;
 }
 
 export interface CommentText {
@@ -30,7 +30,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ postId }) => {
                 const fetchedComments = await getComments(postId);
                 console.log(fetchedComments);
                 for (let i = 0; i < fetchedComments.length; i++) {
-                    fetchedComments[i].created_at = new Date(fetchedComments[i].created_at).toLocaleDateString();
+                    fetchedComments[i].createdAt = fetchedComments[i].createdAt.split('T')[0];
                 }
                 setComments(fetchedComments);
                 setLoading(false);
@@ -62,8 +62,8 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ postId }) => {
         <div>
             {comments.map((comment, index: number) => (
                 <div key={index}>
-                    <p><strong>User {comment.username} commented:</strong> {comment.content}</p>
-                    <p>Date: {new Date(comment.created_at).toLocaleDateString()}</p>
+                    <p>Date: {comment.createdAt.replace('T', ' ').split('.')[0]}</p>
+                    <p><strong>{comment.username} :</strong> {comment.content}</p>
                 </div>
             ))}
             {loading && <p>Loading comments...</p>}

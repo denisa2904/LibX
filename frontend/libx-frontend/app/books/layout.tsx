@@ -50,7 +50,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       const params = new URLSearchParams(searchParams);
       if (term) {
         params.set('q', term);
-        console.log(`Searching for ${term}`);
       } else {
         params.delete('q');
       }
@@ -69,16 +68,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     const criteria = {
       author: [formData.get('author') as string],
       genre: [formData.get('genre') as string],
-      publisher: [formData.get('publisher') as string]
+      publisher: [formData.get('publisher') as string],
+      rating: [formData.get('rating') as string]
     };
-    try {
-      const filteredBooks = await fetchBooksByCriteria(criteria);
-      console.log('Filtered Books:', filteredBooks);
-    } catch (error) {
-      console.error('Error applying filters:', error);
-    }
+
+    localStorage.setItem('searchCriteria', JSON.stringify(criteria));
+
+    replace('/books/criteria');
     closeDialog();
-  };
+};
+
 
   return (
     <div className="flex h-screen flex-col md:flex-row md:overflow-hidden">
@@ -138,8 +137,21 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                       </select>
                     </div>
                   </div>
+
+                  <div>
+                    <label htmlFor="rating">Minimum Rating:</label>
+                    <input type="number" id="rating" name="rating" min="0" max="5" step="0.1" />
+                  </div>
                   
-                  <button type="submit">Apply Filters</button>
+                  <div className="flex justify-end">
+                    <button
+                      type="submit"
+                      className="px-4 py-2 rounded bg-accent text-white hover:bg-primary"
+                    >
+                      Apply Filters
+                    </button>
+                  </div>
+
                 </form>
               </DialogContent>
             </Dialog>

@@ -35,6 +35,7 @@ export default function ProfilePage() {
                 password: data.password
             });
         });
+        
     }, []);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {

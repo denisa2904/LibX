@@ -21,13 +21,11 @@ public class UserService {
 
     private final JwtService jwtService;
 
-    private final BookService bookService;
 
     @Autowired
-    public UserService(UserRepo userRepo, JwtService jwtService, BookService bookService) {
+    public UserService(UserRepo userRepo, JwtService jwtService) {
         this.userRepo = userRepo;
         this.jwtService = jwtService;
-        this.bookService = bookService;
     }
 
     public String getUsernameFromJwt(@NonNull HttpServletRequest request) {

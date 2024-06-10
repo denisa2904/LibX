@@ -23,7 +23,7 @@ export interface Genre {
 export interface Comments {
     content: string;
     username: string;
-    created_at: string;
+    createdAt: string;
 }
 
 export interface CommentText {

@@ -27,6 +27,8 @@ public interface BookRepo extends JpaRepository<Book, UUID>{
     List<Book> findAllByPublisherContaining(String publisher);
     List<Book> findAllByDescriptionContaining(String description);
 
+    List<Book> findAllByRatingGreaterThanEqual(float rating);
+
     @Transactional
     @Modifying
     @Query(value = "DELETE FROM recommendations WHERE recommended_book_id = :bookId OR book_id = :bookId", nativeQuery = true)
