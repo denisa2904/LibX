@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from './profile.module.css';
 import { useAuth } from '@/api/auth';
-import { getUser, updateUser } from '@/api/actions';
+import { getUser, updateUser } from '@/api/user';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';

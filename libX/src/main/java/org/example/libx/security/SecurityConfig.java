@@ -34,6 +34,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/api/auth/**").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/api/books/criteria").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/books/**").permitAll();
+                    auth.requestMatchers(HttpMethod.GET, "/api/users/recs").permitAll();
                     auth.requestMatchers(HttpMethod.POST, "/api/users/favorites").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/users/favorites").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/api/users/favorites/**").permitAll();

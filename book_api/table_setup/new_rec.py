@@ -1,3 +1,5 @@
+import uuid
+
 import pandas as pd
 import numpy as np
 from scipy.sparse.linalg import svds
@@ -51,11 +53,15 @@ def fetch_data(conn):
 
 
 def create_matrix(interaction_data, similarity_data):
-    """Creates a matrix from the data and adjusts it based on user similarity."""
     interactions = pd.DataFrame(interaction_data, columns=['user_id', 'book_id', 'rating'])
+    # Ensure UUIDs are recognized and used properly in the DataFrame
+    interactions['user_id'] = interactions['user_id'].apply(uuid.UUID)
     user_book_matrix = interactions.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
 
+    # Assuming similarity_data also contains UUIDs
     similarities = pd.DataFrame(similarity_data, columns=['user1', 'user2', 'common_books'])
+    similarities['user1'] = similarities['user1'].apply(uuid.UUID)
+    similarities['user2'] = similarities['user2'].apply(uuid.UUID)
 
     for _, row in similarities.iterrows():
         user1, user2, common_books = row['user1'], row['user2'], row['common_books']
@@ -67,7 +73,6 @@ def create_matrix(interaction_data, similarity_data):
 
 
 def get_recommendations(data, read_history_data):
-    """Generates recommendations for each book, excluding those already in read history."""
     data = data.fillna(0)
     R = data.values
     user_ratings_mean = np.mean(R, axis=1)
@@ -76,17 +81,18 @@ def get_recommendations(data, read_history_data):
     U, sigma, Vt = svds(R_demeaned, k=7)
     sigma = np.diag(sigma)
     all_user_predicted_ratings = np.dot(np.dot(U, sigma), Vt) + user_ratings_mean.reshape(-1, 1)
-    preds = pd.DataFrame(all_user_predicted_ratings, columns=data.columns)
+    preds = pd.DataFrame(all_user_predicted_ratings, columns=data.columns, index=data.index)
+
     read_history = pd.DataFrame(read_history_data, columns=['user_id', 'book_id'])
+    read_history['user_id'] = read_history['user_id'].apply(uuid.UUID)
 
     recommendations = []
-    for idx, row in preds.iterrows():
-        user_id = data.index[idx]
+    for user_id, row in preds.iterrows():
         user_read_books = set(read_history[read_history['user_id'] == user_id]['book_id'])
         similar_indices = row.argsort()[:-12:-1]
         similar_books = [(data.columns[i], row.iloc[i]) for i in similar_indices if
                          data.columns[i] not in user_read_books]
-        recommendations.extend([(idx, book[0]) for book in similar_books if book[0] != idx])
+        recommendations.extend([(user_id, book[0]) for book in similar_books if book[0] != user_id])
     return recommendations
 
 
@@ -109,7 +115,8 @@ def store_recommendations(conn, recommendations):
     insert_query = "INSERT INTO user_recommendations (user_id, book_id) VALUES (%s, %s) ON CONFLICT DO NOTHING"
     with conn.cursor() as cursor:
         for user_id, book_id in recommendations:
-            cursor.execute(insert_query, (user_id, book_id))
+            print(f"Inserting recommendation for user {user_id}: {book_id}")
+            cursor.execute(insert_query, (str(user_id), str(book_id)))
             print(f"Inserted recommendation for user {user_id}: {book_id}")
         conn.commit()
 
@@ -118,7 +125,6 @@ def main():
     conn = connect_to_db()
     setup_database(conn)
     interaction_data, read_history_data, similarity_data = fetch_data(conn)
-    print("Fetched similarity data: ", similarity_data)
     data_matrix = create_matrix(interaction_data, similarity_data)
     recs = get_recommendations(data_matrix, read_history_data)
     store_recommendations(conn, recs)

@@ -185,3 +185,19 @@ export const updateUser = async (user: UserUpdate): Promise<UserUpdate> => {
         throw error;  
     }
 };
+
+export const getRecs = async (): Promise<Book[]> => {
+    const books: Book[] = [];
+    try {
+        const response = await fetch(`${API_URL}/recs`, {
+            method: 'GET',
+            credentials: 'include'
+        });
+        if (!response.ok) {
+            return books;
+        }
+        return await response.json() as Book[];
+    } catch (error) {
+        return books;
+    }
+}

@@ -72,15 +72,15 @@ public class User implements UserDetails{
     )
     private List<Book> readBooks = new ArrayList<>();
 
+    @Getter
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    List<Comment> comments = new ArrayList<>();
-
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    List<Rating> ratings = new ArrayList<>();
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "user_recommendations",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "book_id")
+    )
+    private List<Book> user_recommendations = new ArrayList<>();
 
     public User() {
     }

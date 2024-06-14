@@ -86,6 +86,14 @@ public class UserController {
         return ResponseEntity.status(OK).body(userService.getUserReadBooks(user.getId()));
     }
 
+    @GetMapping(path = "/recs")
+    public ResponseEntity<?> getRecommendations(@NonNull HttpServletRequest request) {
+        User user = getUser(request);
+        if (user == null)
+            return ResponseEntity.status(NOT_FOUND).body("User not found");
+        return ResponseEntity.status(OK).body(userService.getUserRecommendations(user.getId()));
+    }
+
     @GetMapping(path = "/rented")
     public ResponseEntity<?> getRentedBooks(@NonNull HttpServletRequest request) {
         User user = getUser(request);

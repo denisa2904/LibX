@@ -78,6 +78,11 @@ public class UserService {
         return 0;
     }
 
+    public List<Book> getUserRecommendations(UUID userId){
+        Optional<User> user = getUserById(userId);
+        return user.map(User::getUser_recommendations).orElse(null);
+    }
+
     public List<Book> getUserRentedBooks(UUID userId){
         Optional<User> user = getUserById(userId);
         return user.map(User::getRentedBooks).orElse(null);

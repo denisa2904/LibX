@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Book, fetchImage} from '@/api/get-individual-book';  
 import BookImage from './book_image'; 
 import { Heart } from 'lucide-react';
-import { addFavourite, removeFavourite , isFavourite} from '@/api/actions';
+import { addFavourite, removeFavourite , isFavourite} from '@/api/user';
 import { useAuth } from '@/api/auth';
 import { deleteBook, updateBook, updateBookPhoto } from '@/api/admin';
 import { getRatings, RatingResponse, addRating, getUserRating } from '@/api/get-individual-book';

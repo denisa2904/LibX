@@ -1,6 +1,6 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { getFavourites } from '@/api/actions';
+import { getFavourites } from '@/api/user';
 import BookImage from '@/app/ui/books/book_image';
 import { Pagination } from 'antd';
 import styles from './books.module.css';

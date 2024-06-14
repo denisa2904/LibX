@@ -11,7 +11,7 @@ import styles from '@/app/books/books.module.css';
 import BookImage from '@/app/ui/books/book_image';
 import Autoplay from "embla-carousel-autoplay"
 import { useAuth } from '@/api/auth';
-import { isRented, rentBook, returnBook } from '@/api/actions';
+import { isRented, rentBook, returnBook, getRecs } from '@/api/user';
 import {
     Carousel,
     CarouselContent,
@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from '@/app/ui/button';
 import CommentsSection from '@/app/ui/books/comments';
+import { get } from 'http';
 
 interface BookPageProps {
     params: { id: string };
@@ -34,6 +35,7 @@ declare global {
 const BookPage: React.FC<BookPageProps> = ({ params }) => {
     const [book, setBook] = useState<Book | null>(null);
     const [recommendedBooks, setRecommendedBooks] = useState<Book[]>([]);
+    const [userRecs, setUserRecs] = useState<Book[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const{ isAuthenticated } = useAuth();
     const [isRentedBook, setIsRentedBook] = useState<boolean>(false);
@@ -46,6 +48,8 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
                 setBook(fetchedBook);
                 const recommended = await getRecommendedBooks(params.id);
                 setRecommendedBooks(recommended);
+                const recs = await getRecs();
+                setUserRecs(recs);
                 setLoading(false);
             } catch (error) {
                 console.error('Failed to load data:', error);
@@ -147,11 +151,11 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
                     ) : null}
             </div>
             <div className="mt-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-2">You might like:</h2>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-2">Similar books:</h2>
                 <Carousel className='lg:align-items center'
                     plugins={[
                         Autoplay({
-                        delay: 2000,
+                        delay: 3000,
                         }),
                     ]}>
                     <CarouselContent className="-ml-1">
@@ -175,16 +179,17 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
                     <CarouselNext />
                 </Carousel>
             </div>
+            {isAuthenticated ? (
             <div className="mt-6">
-                <h2 className="text-2xl font-semibold text-gray-800 mb-2">You might like:</h2>
+                <h2 className="text-2xl font-semibold text-gray-800 mb-2">You might enjoy:</h2>
                 <Carousel className='lg:align-items center'
                     plugins={[
                         Autoplay({
-                        delay: 2000,
+                        delay: 3000,
                         }),
                     ]}>
                     <CarouselContent className="-ml-1">
-                        {recommendedBooks.map((book) => (
+                        {userRecs.map((book) => (
                             <CarouselItem key={book.id} className="pl-1 md:basis-1/5 lg:basis-1/5">
                                 <div className="p-1">
                                 <Link key={book.id} href={`/books/${book.id}`} passHref>
@@ -203,7 +208,7 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
                     <CarouselPrevious />
                     <CarouselNext />
                 </Carousel>
-            </div>
+            </div>) : null}
             <div className=" mt-6 p-6 rounded-lg shadow-lg">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-2 ">Comments:</h2>
                 <CommentsSection postId={book.id} />

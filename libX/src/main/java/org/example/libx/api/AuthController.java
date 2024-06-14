@@ -8,7 +8,6 @@ import org.example.libx.model.LoginRequest;
 import org.example.libx.model.RegisterRequest;
 import org.example.libx.model.User;
 import org.example.libx.service.AuthService;
-import org.example.libx.service.JwtService;
 import org.example.libx.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,8 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 
 @RestController
