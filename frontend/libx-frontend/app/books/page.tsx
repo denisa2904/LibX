@@ -32,7 +32,7 @@ const BooksComponent: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [booksPerPage] = useState<number>(30);
+  const [booksPerPage] = useState<number>(15);
   const [newBook, setNewBook] = useState<Book_with_no_id>({
     title: '',
     author:'',

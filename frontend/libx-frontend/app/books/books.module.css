@@ -93,6 +93,17 @@
   padding-bottom: 12px; /* Adjust padding as necessary */
 }
 
+.previewButton{
+  color: white; 
+  background-color: #3182CE; 
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+
+}
+
 .rentButton, .returnButton {
   color: white; /* Text color */
   background-color: #4CAF50; /* Green background for availability */
@@ -103,15 +114,16 @@
   transition: background-color 0.3s, transform 0.2s;
 }
 
-.rentButton:hover, .returnButton:hover {
-  background-color: #45a049; /* Slightly darker on hover */
+.rentButton:hover{
+  background-color: #3D4A2F; /* Slightly darker on hover */
   transform: scale(1.05); /* Slight scale up effect */
 }
 
-/* Specific styles for Rent button */
-.rentButton {
-  background-color: #3D4A2F; /* Green, suggesting availability */
+.returnButton:hover{
+  background-color: #922820;
+  transform: scale(1.05); 
 }
+
 
 /* Specific styles for Return button */
 .returnButton {

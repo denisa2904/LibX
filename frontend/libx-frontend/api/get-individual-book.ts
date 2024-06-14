@@ -8,6 +8,7 @@ export interface Book {
     year: number;
     description: string;
     rating: number;
+    previews: string;
     image: {
         id: string;
         title: string;

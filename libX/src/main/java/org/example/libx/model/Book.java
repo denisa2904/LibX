@@ -47,6 +47,9 @@ public class Book {
     @Column(name = "rating", nullable = false)
     private float rating;
 
+    @Column(name = "previews")
+    private String previews;
+
     @OneToOne(mappedBy = "book", cascade = CascadeType.REMOVE)
     private Image image;
 

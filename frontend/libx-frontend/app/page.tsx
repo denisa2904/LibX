@@ -1,8 +1,8 @@
 'use client';
 import React from 'react';
-import SideNav from '@/app/ui/home/navbar';
 
 const Home = () => {
+    window.location.href = '/home';
     return (
             <div>
                 <main className="my-8">

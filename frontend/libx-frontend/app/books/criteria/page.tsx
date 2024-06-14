@@ -14,7 +14,7 @@ const BooksComponent: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [booksPerPage] = useState<number>(30);
+  const [booksPerPage] = useState<number>(15);
   const [criteria, setCriteria] = useState<Criteria>(
     {
       rating: ['']
@@ -44,7 +44,6 @@ const BooksComponent: React.FC = () => {
   const indexOfLastBook = currentPage * booksPerPage;
   const indexOfFirstBook = indexOfLastBook - booksPerPage;
   const currentBooks = books.slice(indexOfFirstBook, indexOfLastBook);
-  console.log('boooooooks:', books);
   const onPageChange = (page: number) => {
     setCurrentPage(page);
   };

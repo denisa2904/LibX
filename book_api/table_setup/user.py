@@ -36,7 +36,7 @@ def main():
     create_user_table()
     username = 'admin'
     email = 'admin@admin.com'
-    password = 'Ab24G47_24'
+    password = 'admin'
     add_user(username, email, password, 'admin')
     print("User added successfully.")
 

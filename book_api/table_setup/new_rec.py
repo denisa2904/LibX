@@ -1,93 +1,131 @@
-import psycopg2
-import psycopg2.extras
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
+import numpy as np
+from scipy.sparse.linalg import svds
 from connection.connect_db import connect_to_db
 
 
+def fetch_data(conn):
+    """Fetches data from the database for all relevant user-book interactions, including read history."""
+    similarity_query = """
+            SELECT a.user_id as user1, b.user_id as user2, COUNT(*) as common_books
+            FROM (
+                SELECT user_id, book_id FROM favorites
+                UNION ALL
+                SELECT user_id, book_id FROM rented_books
+                UNION ALL
+                SELECT user_id, book_id FROM read_history
+            ) a
+            JOIN (
+                SELECT user_id, book_id FROM favorites
+                UNION ALL
+                SELECT user_id, book_id FROM rented_books
+                UNION ALL
+                SELECT user_id, book_id FROM read_history
+            ) b ON a.book_id = b.book_id AND a.user_id != b.user_id
+            GROUP BY a.user_id, b.user_id
+        """
+    interaction_query = """
+        SELECT user_id, book_id, SUM(rating) as rating
+        FROM (
+            SELECT user_id, book_id, rating FROM ratings
+            UNION ALL
+            SELECT user_id, book_id, 3 AS rating FROM favorites
+            UNION ALL
+            SELECT user_id, book_id, 2 AS rating FROM rented_books
+            UNION ALL
+            SELECT user_id, book_id, 1 AS rating FROM read_history
+        ) AS combined
+        GROUP BY user_id, book_id
+    """
+    read_history_query = "SELECT user_id, book_id FROM read_history"
+
+    with conn.cursor() as crs:
+        crs.execute(interaction_query)
+        interaction_data = crs.fetchall()
+        crs.execute(read_history_query)
+        read_history_data = crs.fetchall()
+        crs.execute(similarity_query)
+        similarity_data = crs.fetchall()
+
+    return interaction_data, read_history_data, similarity_data
+
+
+def create_matrix(interaction_data, similarity_data):
+    """Creates a matrix from the data and adjusts it based on user similarity."""
+    interactions = pd.DataFrame(interaction_data, columns=['user_id', 'book_id', 'rating'])
+    user_book_matrix = interactions.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
+
+    similarities = pd.DataFrame(similarity_data, columns=['user1', 'user2', 'common_books'])
+
+    for _, row in similarities.iterrows():
+        user1, user2, common_books = row['user1'], row['user2'], row['common_books']
+        if user1 in user_book_matrix.index and user2 in user_book_matrix.index:
+            user_book_matrix.loc[user1] += user_book_matrix.loc[user2] * common_books
+            user_book_matrix.loc[user2] += user_book_matrix.loc[user1] * common_books
+
+    return user_book_matrix
+
+
+def get_recommendations(data, read_history_data):
+    """Generates recommendations for each book, excluding those already in read history."""
+    data = data.fillna(0)
+    R = data.values
+    user_ratings_mean = np.mean(R, axis=1)
+    R_demeaned = R - user_ratings_mean.reshape(-1, 1)
+
+    U, sigma, Vt = svds(R_demeaned, k=7)
+    sigma = np.diag(sigma)
+    all_user_predicted_ratings = np.dot(np.dot(U, sigma), Vt) + user_ratings_mean.reshape(-1, 1)
+    preds = pd.DataFrame(all_user_predicted_ratings, columns=data.columns)
+    read_history = pd.DataFrame(read_history_data, columns=['user_id', 'book_id'])
+
+    recommendations = []
+    for idx, row in preds.iterrows():
+        user_id = data.index[idx]
+        user_read_books = set(read_history[read_history['user_id'] == user_id]['book_id'])
+        similar_indices = row.argsort()[:-12:-1]
+        similar_books = [(data.columns[i], row.iloc[i]) for i in similar_indices if
+                         data.columns[i] not in user_read_books]
+        recommendations.extend([(idx, book[0]) for book in similar_books if book[0] != idx])
+    return recommendations
+
+
 def setup_database(conn):
-    """Creates the necessary tables for the recommendation module."""
-    try:
-        with conn.cursor() as crs:
-            crs.execute("""
-                DROP TABLE IF EXISTS recommendations;
-                CREATE TABLE IF NOT EXISTS recommendations (
-                    book_id UUID NOT NULL,
-                    recommended_book_id UUID NOT NULL,
-                    similarity_score REAL NOT NULL,
-                    PRIMARY KEY (book_id, recommended_book_id),
-                    FOREIGN KEY (book_id) REFERENCES book(id),
-                    FOREIGN KEY (recommended_book_id) REFERENCES book(id)
-                    ON DELETE CASCADE
-                );
-            """)
-            conn.commit()
-    except Exception as e:
-        print(f"Error setting up database: {e}")
-        conn.rollback()
-
-
-def insert_recommendation(conn, recs):
-    """Inserts recommendations into the database using batch inserts."""
-    try:
-        with conn.cursor() as crs:
-            psycopg2.extras.execute_batch(crs, """
-                INSERT INTO recommendations (book_id, recommended_book_id, similarity_score) VALUES (%s, %s, %s)
-                ON CONFLICT DO NOTHING;
-            """, recs, page_size=100)
+    """Create necessary tables in the database."""
+    create_table_query = """
+    CREATE TABLE IF NOT EXISTS user_recommendations (
+        user_id UUID,
+        book_id UUID,
+        PRIMARY KEY (user_id, book_id)
+    );
+    """
+    with conn.cursor() as cursor:
+        cursor.execute(create_table_query)
         conn.commit()
-    except Exception as e:
-        print(f"Failed to insert recommendations: {e}")
-        conn.rollback()
 
 
-def get_all_books(conn):
-    """Extracts all books' ids and descriptions."""
-    try:
-        with conn.cursor() as crs:
-            crs.execute("SELECT id, description FROM book")
-            books = crs.fetchall()
-        return {'book_id': [book[0] for book in books], 'description': [book[1] for book in books]}
-    except Exception as e:
-        print(f"Error retrieving books: {e}")
-        return None
-
-
-def text_processing(data):
-    """Processes the text data to be used in the recommendation system."""
-    tfidf = TfidfVectorizer(stop_words='english')
-    tfidf_matrix = tfidf.fit_transform(data['description'])
-    return tfidf_matrix
-
-
-def get_recommendations(conn):
-    """Generates recommendations for each book."""
-    data = get_all_books(conn)
-    if data:
-        data_frame = pd.DataFrame(data)
-        tfidf_matrix = text_processing(data_frame)
-        cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
-        recommendations = []
-        for idx, row in data_frame.iterrows():
-            similar_indices = cosine_sim[idx].argsort()[:-12:-1]
-            recommendations.extend([
-                (row['book_id'], data_frame['book_id'][i], float(cosine_sim[idx][i]))
-                for i in similar_indices if i != idx
-            ])
-        return recommendations
-    else:
-        return []
+def store_recommendations(conn, recommendations):
+    """Stores the recommendations in the database."""
+    insert_query = "INSERT INTO user_recommendations (user_id, book_id) VALUES (%s, %s) ON CONFLICT DO NOTHING"
+    with conn.cursor() as cursor:
+        for user_id, book_id in recommendations:
+            cursor.execute(insert_query, (user_id, book_id))
+            print(f"Inserted recommendation for user {user_id}: {book_id}")
+        conn.commit()
 
 
 def main():
     conn = connect_to_db()
     setup_database(conn)
-    recs = get_recommendations(conn)
-    if recs:
-        insert_recommendation(conn, recs)
+    interaction_data, read_history_data, similarity_data = fetch_data(conn)
+    print("Fetched similarity data: ", similarity_data)
+    data_matrix = create_matrix(interaction_data, similarity_data)
+    recs = get_recommendations(data_matrix, read_history_data)
+    store_recommendations(conn, recs)
     conn.close()
-    print("Recommendations updated.")
+    print("Recommendations:")
+    for rec in recs:
+        print(rec)
 
 
 if __name__ == '__main__':

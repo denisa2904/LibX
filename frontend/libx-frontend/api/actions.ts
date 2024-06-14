@@ -58,18 +58,18 @@ export const returnBook = async (bookId : string) => {
 }
 
 export const getRentals = async (): Promise<Book[]> => {
+    const books: Book[] = [];
     try {
         const response = await fetch(`${API_URL}/rented`, {
             method: 'GET',
             credentials: 'include'
         });
         if (!response.ok) {
-            throw new Error(`Failed to fetch rented books: ${response.status}`);
+            return books;
         }
         return await response.json() as Book[];
     } catch (error) {
-        console.error('Fetch rented books error:', error);
-        throw error;
+        return books;
     }
 }
 
@@ -104,18 +104,19 @@ export const addFavourite = async (bookId : string) => {
 }
 
 export const getFavourites = async (): Promise<Book[]> => {
+    const books : Book[] = [];
     try {
         const response = await fetch(`${API_URL}/favorites`, {
             method: 'GET',
             credentials: 'include'
         });
-        if (!response.ok) {
-            throw new Error(`Failed to fetch favourite books: ${response.status}`);
-        }
+        if (response.ok) {
         return await response.json() as Book[];
+        } else {
+            return books;
+        }
     } catch (error) {
-        console.error('Fetch favourite books error:', error);
-        throw error;
+        return books;
     }
 }
 

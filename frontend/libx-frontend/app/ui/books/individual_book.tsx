@@ -25,6 +25,7 @@ import { notification } from 'antd';
 import type { ArgsProps } from 'antd/lib/notification';
 import { NotificationPlacement } from 'antd/lib/notification/interface';
 
+
 interface IndividualBookProps {
     params: { id: string };
 }
@@ -126,7 +127,9 @@ const IndividualBook: React.FC<IndividualBookProps> = ({ params }) => {
             const newImageUrl = await updateBookPhoto(params.id, imageFile);
             if (newImageUrl) {
                 showNotification('success', 'Image updated successfully!');
+                // window.location.reload();
                 setBook(prevBook => {
+                    window.location.reload();
                     if (prevBook === null) return null;
                     return { ...prevBook, imageUrl: newImageUrl };
                 });
