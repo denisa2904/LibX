@@ -28,3 +28,4 @@ book_api/table_setup/connection/db_connection
 libX/src/main/resources/application.properties
 libX/src/main/resources/application.properties
 book_api/firebase/sdk/firebaseProps.json
+book_api/firebase/cloud_sdk/libx-bc35e-535ab2ee56a3.json
