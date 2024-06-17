@@ -13,6 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { register as registerUser, useAuth } from '@/api/auth';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const schema = z.object({
   username: z.string().min(1, "Username is required"),
@@ -31,10 +32,16 @@ export default function RegisterForm() {
     const onSubmit = async (data: any) => {
         try {
             const response = await registerUser(data); 
-            console.log('Registration successful:', response);
-            setErrorMessage('');
-            setIsAuthenticated(true);
-            router.push('/profile');
+            if(response){
+              console.log('Registration successful:', response);
+              setErrorMessage('');
+              setIsAuthenticated(true);
+              router.push('/login');
+            }
+            else{
+              setErrorMessage('Failed to register');
+              console.error('Registration error:', response);
+            }
             
         } catch (error: any) {
             console.error('Registration error:', error);
@@ -88,9 +95,16 @@ export default function RegisterForm() {
                 <KeyIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
             </div>
         </div>
-        <Button type="submit" className="mt-4 w-full">
-          Register <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
-        </Button>
+        <div className="flex items-center justify-between">
+                <Link href = '/login'>
+                    <span className="text-sm text-blue-500">Already have an account? Click here to log in.</span>
+                </Link>
+            </div>
+          <div className="flex items-center justify-between">
+            <Button type="submit" className="mt-5 w-full">
+              Register <ArrowRightIcon className="h-5 w-5 ml-2" />
+            </Button>
+      </div>
         {errorMessage && (
           <div className="flex h-8 items-center space-x-1">
             <ExclamationCircleIcon className="h-5 w-5 text-red-500" />

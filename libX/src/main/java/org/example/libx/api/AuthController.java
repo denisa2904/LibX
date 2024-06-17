@@ -50,7 +50,6 @@ public class AuthController {
         }
 
         AuthResponse authResponse = service.register(request);
-        setHttpOnlyCookie(response, authResponse.getToken());
         return ResponseEntity.ok(authResponse);
     }
 

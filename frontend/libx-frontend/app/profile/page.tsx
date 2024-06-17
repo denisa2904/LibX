@@ -23,12 +23,12 @@ export default function ProfilePage() {
     const [editable, setEditable] = useState(false);
     const isAuth = useAuth();
 
-    if (!isAuth) {
-        window.location.href = '/login';
-    }
-
     useEffect(() => {
         getUser().then((data) => {
+            if (!data) {
+                window.location.href = '/login';
+                return;
+            }
             setUser({
                 username: data.username,
                 email: data.email,

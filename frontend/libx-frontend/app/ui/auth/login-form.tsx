@@ -87,7 +87,7 @@ export default function LoginForm() {
             </div>
             <div className="flex items-center justify-between">
                 <Button type="submit" className="w-full mt-5">
-                    <span>Login</span>
+                    Login
                     <ArrowRightIcon className="h-5 w-5 ml-2" />
                 </Button>
             </div>

@@ -1,4 +1,3 @@
-import { useState, useEffect, useCallback } from 'react';
 import { Book } from './get-individual-book';
 const API_URL = 'http://localhost:9000/api/users';
 
@@ -150,7 +149,7 @@ export const isFavourite = async (bookId : string) => {
     }
 }
 
-export const getUser = async (): Promise<User> => {
+export const getUser = async (): Promise<User|null> => {
     try {
         const response = await fetch(`${API_URL}/self`,{
             method: 'GET',
@@ -161,8 +160,7 @@ export const getUser = async (): Promise<User> => {
         }
         return await response.json() as User;
     } catch (error) {
-        console.error('Fetch user error:', error);
-        throw error;  
+        return null;
     }
 };
 

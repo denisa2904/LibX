@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import SideNav from '@/app/ui/home/navbar';
-import { fetchAuthors, fetchGenres, fetchPublishers, fetchBooksByCriteria } from '@/api/get-books';
+import { fetchAuthors, fetchGenres, fetchPublishers} from '@/api/get-books';
 import styles from '@/app/books/books.module.css';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import {

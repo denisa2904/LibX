@@ -1,5 +1,5 @@
 'use client';
-import React, { use, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Head from 'next/head';
 import IndividualBook from '@/app/ui/books/individual_book';
 import { getIndividualBook, getRecommendedBooks, Book, getRatings, getUserRating} from '@/api/get-individual-book';
@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from '@/app/ui/button';
 import CommentsSection from '@/app/ui/books/comments';
-import { get } from 'http';
 
 interface BookPageProps {
     params: { id: string };

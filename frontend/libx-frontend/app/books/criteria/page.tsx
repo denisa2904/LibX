@@ -1,5 +1,5 @@
 'use client';
-import React, { use, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Criteria, fetchBooksByCriteria} from '@/api/get-books';
 import BookImage from '@/app/ui/books/book_image';
 import { Pagination } from 'antd';

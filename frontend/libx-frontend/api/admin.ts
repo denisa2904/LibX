@@ -1,4 +1,3 @@
-import { useState, useEffect, useCallback } from 'react';
 import { Book } from './get-individual-book';
 import { Book_with_no_id } from '@/app/books/page';
 const API_URL = 'http://localhost:9000/api/books';
