@@ -1,9 +1,9 @@
 package org.example.libx.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.libx.model.AuthResponse;
-import org.example.libx.model.LoginRequest;
-import org.example.libx.model.RegisterRequest;
+import org.example.libx.helpers.AuthResponse;
+import org.example.libx.helpers.LoginRequest;
+import org.example.libx.helpers.RegisterRequest;
 import org.example.libx.model.User;
 import org.example.libx.repository.UserRepo;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

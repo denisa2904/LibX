@@ -1,4 +1,4 @@
-package org.example.libx.model;
+package org.example.libx.helpers;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginRequest {
-    private String username;
-    private String password;
+public class AuthResponse {
+    private String token;
 }

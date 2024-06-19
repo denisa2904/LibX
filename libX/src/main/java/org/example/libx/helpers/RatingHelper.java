@@ -1,4 +1,4 @@
-package org.example.libx.model;
+package org.example.libx.helpers;
 
 import lombok.*;
 

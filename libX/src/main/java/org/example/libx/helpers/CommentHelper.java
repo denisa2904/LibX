@@ -1,4 +1,4 @@
-package org.example.libx.model;
+package org.example.libx.helpers;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AuthResponse {
-    private String token;
+public class CommentHelper {
+    String content;
 }

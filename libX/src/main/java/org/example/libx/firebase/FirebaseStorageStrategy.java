@@ -19,27 +19,6 @@ import java.nio.file.Files;
 public class FirebaseStorageStrategy {
 
     private final String firebasePropsPath = "src/main/resources/firebaseProps.json";
-
-    private String uploadFile(File file, String fileName, String rootFolder) throws IOException {
-        String unified = rootFolder + "/" + fileName;
-        BlobId blobId = BlobId.of("libx-bc35e.appspot.com", unified);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId).setContentType("media").build();
-        Credentials credentials = GoogleCredentials.fromStream(new FileInputStream(firebasePropsPath));
-        Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
-        byte[] allBytes = Files.readAllBytes(file.toPath());
-        storage.create(blobInfo, allBytes);
-        String DOWNLOAD_URL = "https://firebasestorage.googleapis.com/v0/b/libx-bc35e.appspot.com/o/%s?alt=media";
-        return String.format(DOWNLOAD_URL, URLEncoder.encode(fileName, StandardCharsets.UTF_8));
-    }
-
-    private File convertToFile(MultipartFile multipartFile, String fileName) throws IOException {
-        File tempFile = new File(fileName);
-        try (FileOutputStream fos = new FileOutputStream(tempFile)) {
-            fos.write(multipartFile.getBytes());
-        }
-        return tempFile;
-    }
-
     public boolean uploadBytes(byte[] bytes, String fileName, String type) throws IOException {
         String type_ = type.split("/")[1];
         if (type_.equals("jpeg")) {
@@ -52,18 +31,6 @@ public class FirebaseStorageStrategy {
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
         storage.create(blobInfo, bytes);
         return true;
-    }
-
-    public boolean upload(MultipartFile multipartFile, String fileName, String rootFolder) {
-        try {
-            File file = this.convertToFile(multipartFile, fileName);
-            String TEMP_URL = this.uploadFile(file, fileName, rootFolder);
-            file.delete();
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
     }
 
     public byte[] download(String fullPath) throws IOException {

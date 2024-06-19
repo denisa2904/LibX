@@ -2,7 +2,7 @@ package org.example.libx.api;
 
 import org.example.libx.firebase.FirebaseStorageStrategy;
 import org.example.libx.model.Book;
-import org.example.libx.model.Criteria;
+import org.example.libx.helpers.Criteria;
 import org.example.libx.model.Image;
 import org.example.libx.service.BookService;
 import org.example.libx.service.ImageService;

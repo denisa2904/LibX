@@ -51,7 +51,7 @@ public class ImageService {
         if(imageMaybe.isEmpty())
             return 0;
         Image image = imageMaybe.get();
-        String path = image.getBook().getId().toString() + image.getType() ;
+        String path = image.getBook().getId().toString() + image.getType();
         if(firebaseStorageStrategy.deleteFile(imageId.toString())) {
             imageRepo.deleteById(imageId);
             return 1;
@@ -60,19 +60,9 @@ public class ImageService {
     }
 
     public int uploadImage(UUID bookId, MultipartFile image) {
-        System.out.println();
-        System.out.println();
-        System.out.println("Book ID: " + bookId);
-        System.out.println();
-        System.out.println();
         Optional<Book> book = bookRepo.findById(bookId);
         if(book.isEmpty())
             return 0;
-        System.out.println();
-        System.out.println();
-        System.out.println("Book: " + book.get());
-        System.out.println();
-        System.out.println();
         Optional<Image> oldImage = getImageByBookId(bookId);
         oldImage.ifPresent(value -> {
             try {
@@ -84,21 +74,11 @@ public class ImageService {
                 throw new RuntimeException(e);
             }
         });
-        System.out.println();
-        System.out.println();
-        System.out.println("Image: " + image);
-        System.out.println();
-        System.out.println();
         String id = book.get().getId().toString();
         String FileType = image.getContentType();
         Image image1 = new Image(id, FileType);
         if(addImage(image1, bookId) == 0)
             return 0;
-        System.out.println();
-        System.out.println();
-        System.out.println("Image Type: " + FileType);
-        System.out.println();
-        System.out.println();
         try{
             firebaseStorageStrategy.uploadBytes(image.getBytes(), bookId.toString(), FileType);
             return 1;

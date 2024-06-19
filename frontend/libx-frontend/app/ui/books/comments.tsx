@@ -72,7 +72,7 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ postId }) => {
                 onChange={handleNewCommentChange}
                 placeholder="Write a comment..."
             />
-            <Button onClick={handleCommentSubmit}>Post Comment</Button>
+            <Button className = "mt-6"onClick={handleCommentSubmit}>Post Comment</Button>
         </div>
     );
 };

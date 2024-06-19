@@ -2,8 +2,8 @@ package org.example.libx.api;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.example.libx.model.Book;
-import org.example.libx.model.BookId;
-import org.example.libx.model.RegisterRequest;
+import org.example.libx.helpers.BookId;
+import org.example.libx.helpers.RegisterRequest;
 import org.example.libx.model.User;
 import org.example.libx.service.BookService;
 import org.example.libx.service.UserService;

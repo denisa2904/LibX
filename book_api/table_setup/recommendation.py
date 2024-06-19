@@ -5,7 +5,6 @@ from connection.connect_db import connect_to_db
 
 
 def setup_database(conn):
-    """Creates the necessary tables for the recommendation module."""
     with conn.cursor() as crs:
         crs.execute("""
             DROP TABLE IF EXISTS recommendations;
@@ -21,8 +20,6 @@ def setup_database(conn):
 
 
 def insert_recommendation(conn, recs):
-    """Inserts recommendations into the database.
-       'recs' is a list of tuples (book_id, recommended_book_id)."""
     with conn.cursor() as crs:
         crs.executemany("""
             INSERT INTO recommendations (book_id, recommended_book_id) VALUES (%s, %s) ON CONFLICT DO NOTHING;
@@ -30,7 +27,6 @@ def insert_recommendation(conn, recs):
 
 
 def get_all_books(conn):
-    """Extracts all books' ids and descriptions in a json """
     with conn.cursor() as crs:
         crs.execute("SELECT id, description FROM book")
         books = crs.fetchall()
@@ -39,7 +35,6 @@ def get_all_books(conn):
 
 
 def text_processing(data):
-    """Processes the text data to be used in the recommendation system."""
     data = pd.DataFrame(data)
     tfidf = TfidfVectorizer(stop_words='english')
     tfidf_matrix = tfidf.fit_transform(data['description'])
@@ -47,7 +42,6 @@ def text_processing(data):
 
 
 def get_recommendations(conn):
-    """Generates recommendations for each book."""
     data = get_all_books(conn)
     data = pd.DataFrame(data)
     tfidf_matrix = text_processing(data)
@@ -61,7 +55,6 @@ def get_recommendations(conn):
 
 
 def check_recommendation_table(conn):
-    """For each book, get its title and the titles of the recommended books."""
     with conn.cursor() as crs:
         crs.execute("""
             SELECT b1.title, b2.title
@@ -81,7 +74,7 @@ def main():
     recs = check_recommendation_table(conn)
     conn.close()
     print("Recommendations:")
-    return recs
+    print(recs)
 
 
 if __name__ == '__main__':

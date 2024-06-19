@@ -42,8 +42,7 @@ export async function fetchBooksByCriteria(criteria: Criteria): Promise<any[]> {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({criteria}),
-            credentials: 'include' 
+            body: JSON.stringify({criteria})
         });
 
         if (!response.ok) {

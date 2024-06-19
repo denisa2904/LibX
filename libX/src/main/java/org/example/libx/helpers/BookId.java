@@ -1,14 +1,16 @@
-package org.example.libx.model;
+package org.example.libx.helpers;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentHelper {
-    String content;
+public class BookId {
+    UUID id;
 }

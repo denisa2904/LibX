@@ -1,10 +1,8 @@
 import requests
 import uuid
-import psycopg2
 from psycopg2 import sql
 from connection.connect_db import connect_to_db
 
-# Constants
 API_URL = "https://www.googleapis.com/books/v1/volumes?q=inauthor:Patricia+Cornwell"
 
 
@@ -60,20 +58,11 @@ def insert_books_data(conn, books):
 
 def main():
     data = fetch_data(API_URL)
-
     if 'items' in data:
-        # Connect to DB
         conn = connect_to_db()
-
-        # Setup DB
-        # setup_database(conn)
-
-        # Insert data
+        setup_database(conn)
         insert_books_data(conn, data['items'])
-
-        # Close connection
         conn.close()
-
         print("Data inserted successfully.")
     else:
         print("No books found.")

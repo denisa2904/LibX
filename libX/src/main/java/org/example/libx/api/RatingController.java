@@ -2,6 +2,8 @@ package org.example.libx.api;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.NonNull;
+import org.example.libx.helpers.RatingHelper;
+import org.example.libx.helpers.RatingResponse;
 import org.example.libx.model.*;
 import org.example.libx.service.BookService;
 import org.example.libx.service.RatingService;

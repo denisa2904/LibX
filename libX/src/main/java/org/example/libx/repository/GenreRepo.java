@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface GenreRepo extends JpaRepository<Genre, UUID> {
-
     Optional<Genre> findGenreByTitle(String title);
     List<Genre> findAllByTitleContaining(String title);
 

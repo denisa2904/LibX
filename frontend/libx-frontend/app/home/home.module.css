@@ -7,6 +7,7 @@
     background-position: center;
     overflow: hidden;
   }
+
   
   .contentContainer {
     position: relative;
@@ -21,7 +22,7 @@
     background: rgba(255, 255, 255, 0.85);
     padding: 20px;
     border-radius: 10px;
-    overflow: auto;
+    overflow: hidden;
   }
   
   .genreCard {
@@ -66,4 +67,3 @@
     font-size: 1.2rem;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
   }
-

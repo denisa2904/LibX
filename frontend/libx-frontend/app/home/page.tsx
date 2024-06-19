@@ -49,7 +49,7 @@ export default function HomePage() {
   ];
 
   return (
-    <div className={styles.backgroundContainer}>
+    // <div className={styles.backgroundContainer}>
       <div className={`${styles.contentContainer} p-4 md:p-8 rounded-lg space-y-4`}>
         <div className="h-40"></div>
         <h1 className="text-4xl md:text-6xl font-bold">Welcome to LibX</h1>
@@ -70,7 +70,7 @@ export default function HomePage() {
         </div>
         <div className="h-8"></div>
         <h2 className="text-xl md:text-2xl font-semibold mt-8 md:mt-16">Genres</h2>
-        <Carousel className="lg:align-items-center"
+        <Carousel className="align-items-center"
         plugins={
             [
                 Autoplay({
@@ -81,7 +81,7 @@ export default function HomePage() {
         }>
           <CarouselContent className="-ml-1">
             {genres.map((genre, index) => (
-              <CarouselItem key={index} className="pl-1 sm:basis-full md:basis-1/2 lg:basis-1/5">
+              <CarouselItem key={index} className="pl-1 sm:basis-1/5 lg:basis-1/5">
                 <div className="p-1">
                   <Link key={genre.id} href={`/books/genre/${genre.title}`} passHref>
                     <div className={styles.genreCard}>
@@ -103,7 +103,7 @@ export default function HomePage() {
           <CarouselNext />
         </Carousel>
       </div>
-    </div>
+    // </div>
   );
 }
 

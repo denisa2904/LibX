@@ -13,7 +13,7 @@ async def add_book():
     result = run_user_recs_script()
     if result is None:
         raise HTTPException(status_code=500, detail="Script execution failed")
-    return {"status": "success", "result": result}
+    return {"status": "success"}
 
 
 def run_recommendation_script():

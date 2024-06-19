@@ -78,8 +78,7 @@ export async function getRecommendedBooks(bookId: string): Promise<Book[]> {
 export async function getComments(bookId: string): Promise<Comments[]> {
     try {
         const response = await fetch(`${API_URL}/${bookId}/comments`, {
-            method: 'GET',
-            credentials: 'include'
+            method: 'GET'
         });
 
         if (!response.ok) {
@@ -121,8 +120,7 @@ export interface RatingResponse {
 export async function getRatings(bookId: string): Promise<RatingResponse> {
     try {
         const response = await fetch(`${API_URL}/${bookId}/rating`, {
-            method: 'GET',
-            credentials: 'include'
+            method: 'GET'
         });
 
         if (!response.ok) {

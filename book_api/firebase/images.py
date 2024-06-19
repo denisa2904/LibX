@@ -20,7 +20,6 @@ bucket = storage.bucket(app=app)
 
 def fetch_book_ids():
     conn = connect_to_db()
-    book_ids = []
     with conn.cursor() as cur:
         cur.execute("SELECT google_id FROM book")
         book_ids = [row[0] for row in cur.fetchall()]

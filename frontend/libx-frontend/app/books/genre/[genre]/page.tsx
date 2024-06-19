@@ -7,8 +7,6 @@ import styles from '@/app/books/books.module.css';
 import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
 import { Book } from '@/api/get-individual-book';
-import { useAuth } from '@/api/auth';
-import path from 'path';
 import { usePathname } from 'next/navigation';
 
 
@@ -18,7 +16,6 @@ const BooksComponent: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [booksPerPage] = useState<number>(15);
-  const { isAuthenticated } = useAuth();
   const pathname = usePathname();
 
   useEffect(() => {
@@ -49,7 +46,7 @@ const BooksComponent: React.FC = () => {
 
 
   if (error) return <div>Error: {error}</div>;
-  if(!loading && isAuthenticated ) return (
+  if(!loading) return (
         <div>
             <div className={styles.bookGrid}>
                 {currentBooks.map(book => (

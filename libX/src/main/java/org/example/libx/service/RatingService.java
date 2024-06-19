@@ -2,7 +2,7 @@ package org.example.libx.service;
 
 import jakarta.transaction.Transactional;
 import org.example.libx.model.Rating;
-import org.example.libx.model.RatingResponse;
+import org.example.libx.helpers.RatingResponse;
 import org.example.libx.repository.RatingRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

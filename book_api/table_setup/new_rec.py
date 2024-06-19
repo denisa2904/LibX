@@ -7,7 +7,6 @@ from connection.connect_db import connect_to_db
 
 
 def fetch_data(conn):
-    """Fetches data from the database for all relevant user-book interactions, including read history."""
     similarity_query = """
             SELECT a.user_id as user1, b.user_id as user2, COUNT(*) as common_books
             FROM (
@@ -44,8 +43,10 @@ def fetch_data(conn):
     with conn.cursor() as crs:
         crs.execute(interaction_query)
         interaction_data = crs.fetchall()
+
         crs.execute(read_history_query)
         read_history_data = crs.fetchall()
+
         crs.execute(similarity_query)
         similarity_data = crs.fetchall()
 
@@ -54,11 +55,9 @@ def fetch_data(conn):
 
 def create_matrix(interaction_data, similarity_data):
     interactions = pd.DataFrame(interaction_data, columns=['user_id', 'book_id', 'rating'])
-    # Ensure UUIDs are recognized and used properly in the DataFrame
     interactions['user_id'] = interactions['user_id'].apply(uuid.UUID)
     user_book_matrix = interactions.pivot(index='user_id', columns='book_id', values='rating').fillna(0)
 
-    # Assuming similarity_data also contains UUIDs
     similarities = pd.DataFrame(similarity_data, columns=['user1', 'user2', 'common_books'])
     similarities['user1'] = similarities['user1'].apply(uuid.UUID)
     similarities['user2'] = similarities['user2'].apply(uuid.UUID)
@@ -97,7 +96,6 @@ def get_recommendations(data, read_history_data):
 
 
 def setup_database(conn):
-    """Create necessary tables in the database."""
     create_table_query = """
     CREATE TABLE IF NOT EXISTS user_recommendations (
         user_id UUID,
@@ -111,27 +109,26 @@ def setup_database(conn):
 
 
 def store_recommendations(conn, recommendations):
-    """Stores the recommendations in the database."""
     insert_query = "INSERT INTO user_recommendations (user_id, book_id) VALUES (%s, %s) ON CONFLICT DO NOTHING"
     with conn.cursor() as cursor:
         for user_id, book_id in recommendations:
-            print(f"Inserting recommendation for user {user_id}: {book_id}")
             cursor.execute(insert_query, (str(user_id), str(book_id)))
-            print(f"Inserted recommendation for user {user_id}: {book_id}")
         conn.commit()
 
 
 def main():
     conn = connect_to_db()
-    setup_database(conn)
+    # setup_database(conn)
     interaction_data, read_history_data, similarity_data = fetch_data(conn)
-    data_matrix = create_matrix(interaction_data, similarity_data)
-    recs = get_recommendations(data_matrix, read_history_data)
-    store_recommendations(conn, recs)
+    print(interaction_data)
+    print(similarity_data)
+    # data_matrix = create_matrix(interaction_data, similarity_data)
+    # recs = get_recommendations(data_matrix, read_history_data)
+    # store_recommendations(conn, recs)
     conn.close()
-    print("Recommendations:")
-    for rec in recs:
-        print(rec)
+    # print("Recommendations:")
+    # for rec in recs:
+    #     print(rec)
 
 
 if __name__ == '__main__':

@@ -2,7 +2,7 @@ package org.example.libx.service;
 
 import jakarta.transaction.Transactional;
 import org.example.libx.model.Book;
-import org.example.libx.model.Criteria;
+import org.example.libx.helpers.Criteria;
 import org.example.libx.model.Genre;
 import org.example.libx.model.User;
 import org.example.libx.repository.*;
@@ -70,9 +70,8 @@ public class BookService {
     }
 
     public void updateRecommended(){
-        Book book = new Book();
         String url = "http://localhost:8000/add_book/";
-        ResponseEntity<String> response = restTemplate.postForEntity(url, book, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(url, new Book(), String.class);
     }
 
     public List<Book> getAllBooks() {
@@ -83,10 +82,7 @@ public class BookService {
         return bookRepo.findAllByAuthorContaining(author);
     }
 
-    public Optional<Book> getBookById(UUID id) {
-
-        return bookRepo.findById(id);
-    }
+    public Optional<Book> getBookById(UUID id) { return bookRepo.findById(id); }
 
     public List<Book> getBooksByPublisher(String publisher) {
         return bookRepo.findAllByPublisherContaining(publisher);
@@ -100,11 +96,6 @@ public class BookService {
         if(genre.contains("_"))
             genre = genre.replace("_", " ");
         List<Genre> genres = genreRepo.findAllByTitleContaining(genre);
-        System.out.println();
-        System.out.println();
-        System.out.println(genres);
-        System.out.println();
-        System.out.println();
         if(genres.isEmpty()) {
             Optional<Genre> genreOptional = genreRepo.findGenreByTitle(genre);
             if(genreOptional.isEmpty())
@@ -115,9 +106,6 @@ public class BookService {
         for( Genre g : genres)
             books.addAll(bookRepo.findAllByGenres(Collections.singletonList(g)));
         return books;
-    }
-    public List<Book> getBooksByRating(float rating) {
-        return bookRepo.findAllByRating(rating);
     }
 
     public List<Book> getRecommendedBooks(UUID id) {
@@ -140,26 +128,10 @@ public class BookService {
         }
         return books;
     }
-    /*
-    this is the body for criteria:
-    {
-    "criteria": {
-            "author":["Tolstoy"],
-            "year":["2021"],
-            "genres":["Fiction"]
-        }
-}
-    * */
     public Set<Book> getBooksByCriteria(Criteria criteria){
         Set<Book> books = new HashSet<>();
         Map<String, List<String>> criteriaMap;
         criteriaMap = criteria.getCriteria();
-        System.out.println();
-        System.out.println();
-        System.out.println("HELLO");
-        System.out.println(criteriaMap);
-        System.out.println();
-        System.out.println();
         for(Map.Entry<String, List<String>> entry : criteriaMap.entrySet()){
             switch (entry.getKey()) {
                 case "author" -> {
@@ -189,7 +161,6 @@ public class BookService {
                     if(!entry.getValue().get(0).equals(" ")) {
                         for (String genre : entry.getValue())
                             tempBooks.addAll(getBooksByGenre(genre));
-                        System.out.println("Am gasit " + tempBooks.size() + " carti");
                         if(books.isEmpty())
                             books.addAll(tempBooks);
                         else
@@ -208,11 +179,6 @@ public class BookService {
                 }
             }
         }
-        System.out.println();
-        System.out.println();
-        System.out.println(books.size());
-        System.out.println();
-        System.out.println();
         return books;
     }
 
