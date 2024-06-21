@@ -30,14 +30,11 @@ public class BookController {
     private final ImageService imageService;
     private final FirebaseStorageStrategy firebaseStorageStrategy;
 
-    private final RatingService ratingService;
-
     @Autowired
-    public BookController(BookService bookService, ImageService imageService, FirebaseStorageStrategy firebaseStorageStrategy, RatingService ratingService) {
+    public BookController(BookService bookService, ImageService imageService, FirebaseStorageStrategy firebaseStorageStrategy) {
         this.bookService = bookService;
         this.imageService = imageService;
         this.firebaseStorageStrategy = firebaseStorageStrategy;
-        this.ratingService = ratingService;
     }
 
     @GetMapping
@@ -46,14 +43,11 @@ public class BookController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<?> getBookById(@PathVariable("id") UUID id) {
+    public ResponseEntity<Book> getBookById(@PathVariable("id") UUID id) {
         Optional<Book> bookMaybe = bookService.getBookById(id);
         if(bookMaybe.isEmpty())
-            return ResponseEntity.status(NOT_FOUND).body("Book not found.".getBytes());
-        Book book = bookMaybe.get();
-        book.setRating(ratingService.getAverageRating(id).getRating());
-        bookService.updateBook(book.getId(), book);
-        return ResponseEntity.status(OK).body(book);
+            return ResponseEntity.status(NOT_FOUND).build();
+        return ResponseEntity.status(OK).body(bookMaybe.get());
     }
 
     @GetMapping("author/{author}")
@@ -78,18 +72,15 @@ public class BookController {
 
     @GetMapping("/search")
     public Set<Book> getBooksBySearch(@RequestParam("q") String search) {
-        System.out.println("Searching for books with: " + search);
         return new HashSet<>(bookService.getBooksBySearch(search));
     }
 
     @GetMapping("{id}/image")
     public ResponseEntity<byte[]> getImageByBookId(@PathVariable("id") UUID id) {
-        System.out.println("Fetching image for book ID: " + id);
         Optional<Image> image = imageService.getImageByBookId(id);
 
         if (image.isEmpty()) {
-            System.out.println("Image not found in database for book ID: " + id);
-            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("Image not found.".getBytes());
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).build();
         }
 
         try {
@@ -99,15 +90,13 @@ public class BookController {
                 imageType = "image/jpg";
             imagePath = imagePath + "." + imageType.split("/")[1];
             byte[] img = firebaseStorageStrategy.download(imagePath);
-            System.out.println("Image downloaded successfully, size: " + img.length + " bytes");
 
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(imageType))
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + imagePath + "\"")
                     .body(img);
         } catch (Exception e) {
-            System.out.println("Error occurred while fetching the image: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Image not found.".getBytes());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
 
@@ -123,37 +112,37 @@ public class BookController {
 
 
     @PostMapping
-    public ResponseEntity<?> addBook(@RequestBody Book book) {
+    public ResponseEntity<Void> addBook(@RequestBody Book book) {
         if(bookService.addBook(book) == 1) {
             bookService.updateRecommended();
-            return ResponseEntity.status(CREATED).body("Book added successfully.".getBytes());
+            return ResponseEntity.status(CREATED).build();
         }
-        return ResponseEntity.status(BAD_REQUEST).body("Book already exists or is invalid.".getBytes());
+        return ResponseEntity.status(BAD_REQUEST).build();
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteBook(@PathVariable("id") UUID id) {
-        if(bookService.deleteBook(id) == 1) {
+    public ResponseEntity<Void> deleteBook(@PathVariable("id") UUID id) {
+        if (bookService.deleteBook(id) == 1) {
             bookService.updateRecommended();
-            return ResponseEntity.status(NO_CONTENT).body("Book deleted successfully.".getBytes());
+            return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.status(NOT_FOUND).body("Book not found.".getBytes());
+        return ResponseEntity.notFound().build();
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?> updateBook(@PathVariable("id") UUID id, @RequestBody Book book) {
+    public ResponseEntity<Void> updateBook(@PathVariable("id") UUID id, @RequestBody Book book) {
         if(bookService.updateBook(id, book) == 1){
             bookService.updateRecommended();
-            return ResponseEntity.status(NO_CONTENT).body("Book updated successfully.".getBytes());}
-        return ResponseEntity.status(NOT_FOUND).body("Book not found.".getBytes());
+            return ResponseEntity.status(NO_CONTENT).build();}
+        return ResponseEntity.status(NOT_FOUND).build();
     }
 
     @PutMapping(path = "{id}/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<byte[]> uploadBookImage(@PathVariable("id") UUID id, @RequestParam("image") MultipartFile image) {
+    public ResponseEntity<Void> uploadBookImage(@PathVariable("id") UUID id, @RequestParam("image") MultipartFile image) {
         if(imageService.uploadImage(id, image) == 1){
-            return ResponseEntity.status(NO_CONTENT).body("Image uploaded successfully.".getBytes());
+            return ResponseEntity.status(NO_CONTENT).build();
         }
-        return ResponseEntity.status(NOT_ACCEPTABLE).body("Image is invalid.".getBytes());
+        return ResponseEntity.status(NOT_ACCEPTABLE).build();
     }
 
     @GetMapping("authors")

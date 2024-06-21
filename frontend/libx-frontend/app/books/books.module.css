@@ -1,12 +1,12 @@
 .bookGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
-  gap: 30px; 
+  gap:30px;
   justify-content: start;   
   align-items: start; 
   margin-bottom: 60px;
+  margin-left: 25%;
 }
-
 .bookCard {
   position: relative;
   border-radius: 10px;
@@ -16,6 +16,45 @@
   height: fit-content;
   width: fit-content; 
   transition: background-color 0.3s ease; 
+}
+.carouselContent {
+  overflow: hidden;
+  position: relative;
+  align-items: center;
+}
+
+@media (min-width: 640px) {
+  .CarouselContainer{
+    width: 80%;
+  }
+}
+
+@media (min-width: 500px){
+  .bookGrid{
+    margin-left: 0%;
+  }
+}
+
+.carousel_item_size {
+  flex-basis: 100%;
+}
+
+@media (min-width: 530px) { 
+  .carousel_item_size {
+      flex-basis: 50%;
+  }
+}
+
+@media (min-width: 767px) { 
+  .carousel_item_size {
+      flex-basis: 33.33%;
+  }
+}
+
+@media (min-width: 1100px) { 
+  .carousel_item_size {
+      flex-basis: 20%;
+  }
 }
 
 .bookCard:hover {
@@ -122,8 +161,6 @@
   background-color: #922820;
   transform: scale(1.05); 
 }
-
-
 
 .returnButton {
   background-color: #f44336; 

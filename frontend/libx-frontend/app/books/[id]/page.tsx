@@ -151,7 +151,7 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
             </div>
             <div className="mt-6">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-2">Similar books:</h2>
-                <Carousel className='lg:align-items center'
+                <Carousel className={styles.carouselContent}
                     plugins={[
                         Autoplay({
                         delay: 3000,
@@ -159,29 +159,28 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
                     ]}>
                     <CarouselContent className="-ml-1">
                         {recommendedBooks.map((book) => (
-                            <CarouselItem key={book.id} className="pl-1 md:basis-1/5 lg:basis-1/5">
+                            <CarouselItem key={book.id} className={styles.carousel_item_size}>
                                 <div className="p-1">
-                                <Link key={book.id} href={`/books/${book.id}`} passHref>
                                 <Card>
                                     <CardContent className={styles.bookCard}>
-                                        <div className={styles.bookOverlay}></div>
-                                        <BookImage bookId={book.id} className={styles.bookImage} />
-                                        <div className={styles.bookName}>{book.title}</div>
+                                        <Link key={book.id} href={`/books/${book.id}`} passHref>
+                                            <div className={styles.bookOverlay}></div>
+                                            <BookImage bookId={book.id} className={styles.bookImage} />
+                                            <div className={styles.bookName}>{book.title}</div>
+                                        </Link>
                                     </CardContent>
                                 </Card>
-                                </Link>
                                 </div>
                             </CarouselItem>
                         ))}
                     </CarouselContent>
-                    <CarouselPrevious />
                     <CarouselNext />
                 </Carousel>
             </div>
             {isAuthenticated ? (
             <div className="mt-6">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-2">You might enjoy:</h2>
-                <Carousel className='lg:align-items center'
+                <Carousel className={styles.carouselContent}
                     plugins={[
                         Autoplay({
                         delay: 3000,
@@ -189,23 +188,21 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
                     ]}>
                     <CarouselContent className="-ml-1">
                         {userRecs.map((book) => (
-                            <CarouselItem key={book.id} className="pl-1 md:basis-1/5 lg:basis-1/5">
+                            <CarouselItem key={book.id} className={styles.carousel_item_size}>
                                 <div className="p-1">
-                                <Link key={book.id} href={`/books/${book.id}`} passHref>
                                 <Card>
                                     <CardContent className={styles.bookCard}>
-                                        <div className={styles.bookOverlay}></div>
-                                        <BookImage bookId={book.id} className={styles.bookImage} />
-                                        <div className={styles.bookName}>{book.title}</div>
+                                        <Link key={book.id} href={`/books/${book.id}`} passHref>
+                                            <div className={styles.bookOverlay}></div>
+                                            <BookImage bookId={book.id} className={styles.bookImage} />
+                                            <div className={styles.bookName}>{book.title}</div>
+                                        </Link>
                                     </CardContent>
                                 </Card>
-                                </Link>
                                 </div>
                             </CarouselItem>
                         ))}
                     </CarouselContent>
-                    <CarouselPrevious />
-                    <CarouselNext />
                 </Carousel>
             </div>) : null}
             <div className=" mt-6 p-6 rounded-lg shadow-lg">

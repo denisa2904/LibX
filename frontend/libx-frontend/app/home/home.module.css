@@ -8,7 +8,11 @@
     overflow: hidden;
   }
 
-  
+  .CarouselContainer {
+    position: relative;
+    align-items: center;
+  }
+
   .contentContainer {
     position: relative;
     z-index: 10;
@@ -34,11 +38,20 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     margin: 0.5rem;
   }
+
+  /* @media (min-width: 1389px) {
+    .CarouselContainer{
+      width: 100%;
+    }
+  } */
   
   @media (min-width: 640px) {
     .genreCard {
       width: 200px;
       height: 300px;
+    }
+    .CarouselContainer{
+      width: 80%;
     }
   }
   
@@ -67,3 +80,52 @@
     font-size: 1.2rem;
     text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
   }
+
+.carousel_item_size {
+  flex-basis: 93%;
+}
+
+@media (min-width: 640px) { 
+  .carousel_item_size {
+      flex-basis: 50%;
+  }
+}
+
+@media (min-width: 780px) { 
+  .carousel_item_size {
+      flex-basis: 33.33%;
+  }
+}
+
+@media (min-width: 1050px) { 
+  .carousel_item_size {
+      flex-basis: 25%;
+  }
+}
+
+@media (min-width: 1350px) { 
+  .carousel_item_size {
+      flex-basis: 20%;
+  }
+}
+
+.CarouselPrevious, .CarouselNext {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20;
+  background-color: #fff; /* Change as needed */
+  color: #333; /* Change as needed */
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 50%;
+}
+
+.CarouselPrevious {
+  left: 10px;
+}
+
+.CarouselNext {
+  right: 10px;
+}

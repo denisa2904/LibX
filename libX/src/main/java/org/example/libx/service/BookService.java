@@ -25,18 +25,21 @@ public class BookService {
 
     private final GenreRepo genreRepo;
 
+    private final RatingService ratingService;
+
     @Autowired
     private RestTemplate restTemplate;
 
 
     @Autowired
-    public BookService(BookRepo bookRepo, CommentRepo commentRepo, RatingRepo ratingRepo, UserRepo userRepo, GenreRepo genreRepo, ImageService imageService) {
+    public BookService(BookRepo bookRepo, CommentRepo commentRepo, RatingRepo ratingRepo, UserRepo userRepo, GenreRepo genreRepo, ImageService imageService, RatingService ratingService) {
         this.bookRepo = bookRepo;
         this.commentRepo = commentRepo;
         this.ratingRepo = ratingRepo;
         this.userRepo = userRepo;
         this.genreRepo = genreRepo;
         this.imageService = imageService;
+        this.ratingService = ratingService;
     }
 
     public boolean validateNewBook(Book book) {
@@ -70,8 +73,8 @@ public class BookService {
     }
 
     public void updateRecommended(){
-        String url = "http://localhost:8000/add_book/";
-        ResponseEntity<String> response = restTemplate.postForEntity(url, new Book(), String.class);
+        String url = "http://localhost:8000/edit_recommendations/";
+        restTemplate.postForEntity(url, new Book(), String.class);
     }
 
     public List<Book> getAllBooks() {
@@ -82,7 +85,16 @@ public class BookService {
         return bookRepo.findAllByAuthorContaining(author);
     }
 
-    public Optional<Book> getBookById(UUID id) { return bookRepo.findById(id); }
+    public Optional<Book> getBookById(UUID id) {
+        Optional<Book> book = bookRepo.findById(id);
+        if (book.isPresent()) {
+            Book b = book.get();
+            b.setRating(ratingService.getAverageRating(id).getRating());
+            updateBook(b.getId(), b);
+            return book;
+        }
+        return Optional.empty();
+    }
 
     public List<Book> getBooksByPublisher(String publisher) {
         return bookRepo.findAllByPublisherContaining(publisher);

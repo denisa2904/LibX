@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Logger;
@@ -60,6 +61,10 @@ public class ImageService {
     }
 
     public int uploadImage(UUID bookId, MultipartFile image) {
+        if(!Objects.equals(image.getContentType(), "image/jpeg")
+                && !Objects.equals(image.getContentType(), "image/png")
+                && !Objects.equals(image.getContentType(), "image/jpg"))
+            return 0;
         Optional<Book> book = bookRepo.findById(bookId);
         if(book.isEmpty())
             return 0;

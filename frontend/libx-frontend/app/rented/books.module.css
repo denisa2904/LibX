@@ -1,12 +1,17 @@
 .bookGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Adjust to fit the content exactly */
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
   gap: 30px; 
   justify-content: start;   
   align-items: start; 
   margin-bottom: 60px;
+  margin-left: 20%;
 }
-
+@media (min-width: 477px){
+  .bookGrid{
+    margin-left: 0%;
+  }
+}
 .bookCard {
   position: relative;
   border-radius: 10px;

@@ -25,7 +25,11 @@ public class AuthService {
     public boolean validateNewUser(User user) {
         if(user.getUsername().isEmpty() || user.getPassword().isEmpty() || user.getEmail().isEmpty())
             return false;
-        if(repo.findUserByUsername(user.getUsername()).isPresent())
+        if(repo.findUserByUsername(user.getUsername()).isPresent()|| user.getUsername().length()<4)
+            return false;
+        if(repo.findUserByEmail(user.getEmail()).isPresent()|| !user.getEmail().contains("@"))
+            return false;
+        if(user.getPassword().length()<8)
             return false;
         return repo.findUserByEmail(user.getEmail()).isEmpty();
     }

@@ -19,7 +19,7 @@ import java.nio.file.Files;
 public class FirebaseStorageStrategy {
 
     private final String firebasePropsPath = "src/main/resources/firebaseProps.json";
-    public boolean uploadBytes(byte[] bytes, String fileName, String type) throws IOException {
+    public void uploadBytes(byte[] bytes, String fileName, String type) throws IOException {
         String type_ = type.split("/")[1];
         if (type_.equals("jpeg")) {
             type_ = "jpg";
@@ -30,7 +30,6 @@ public class FirebaseStorageStrategy {
         Credentials credentials = GoogleCredentials.fromStream(new FileInputStream(firebasePropsPath));
         Storage storage = StorageOptions.newBuilder().setCredentials(credentials).build().getService();
         storage.create(blobInfo, bytes);
-        return true;
     }
 
     public byte[] download(String fullPath) throws IOException {

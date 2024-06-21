@@ -41,14 +41,13 @@ public class AuthController {
         }
     }
     @PostMapping(path = "/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request, HttpServletResponse response) {
+    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
         if(!service.validateNewUser(new User(request.getUsername(),
                 request.getEmail(), request.getPassword()
         ))){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).contentType(MediaType.APPLICATION_JSON)
                     .body(AuthResponse.builder().token("Invalid").build());
         }
-
         AuthResponse authResponse = service.register(request);
         return ResponseEntity.ok(authResponse);
     }

@@ -6,11 +6,9 @@ import styles from '@/app/books/books.module.css';
 import { useSearchParams, usePathname, useRouter } from 'next/navigation';
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogTitle,
-  DialogDescription,
-  DialogClose
+  DialogDescription
 } from '@/components/ui/dialog';
 
 export default function Layout({ children }: { children: React.ReactNode }) {

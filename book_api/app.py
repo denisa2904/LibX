@@ -5,7 +5,7 @@ import os
 app = FastAPI()
 
 
-@app.post("/add_book/")
+@app.post("/edit_recommendations/")
 async def add_book():
     result = run_recommendation_script()
     if result is None:
