@@ -26,7 +26,7 @@ def run_recommendation_script():
             check=True
         )
         print("Script stdout:", result.stdout)
-        return result.stdout
+        return 'true'
     except subprocess.CalledProcessError as e:
         print(f"Script execution failed: {e.stderr}")
         return None
@@ -45,7 +45,7 @@ def run_user_recs_script():
             check=True
         )
         print("Script stdout:", result.stdout)
-        return result.stdout
+        return 'true'
     except subprocess.CalledProcessError as e:
         print(f"Script execution failed: {e.stderr}")
         return None

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Book, fetchImage} from '@/api/get-individual-book';  
+import { Book} from '@/api/get-individual-book';  
 import BookImage from './book_image'; 
 import { Heart } from 'lucide-react';
 import { addFavourite, removeFavourite , isFavourite} from '@/api/user';
@@ -24,6 +24,7 @@ import styles from '@/app/books/books.module.css';
 import { notification } from 'antd';
 import type { ArgsProps } from 'antd/lib/notification';
 import { NotificationPlacement } from 'antd/lib/notification/interface';
+
 
 
 interface IndividualBookProps {
@@ -117,6 +118,22 @@ const IndividualBook: React.FC<IndividualBookProps> = ({ params }) => {
             console.error('Update error:', error);
         }
     };
+
+    const handleDeleteBook = async () => {
+        try {
+            if (await deleteBook(params.id)) {
+                showNotification('success', 'Book deleted successfully!');
+                setTimeout(() => {
+                    window.location.href = '/books';
+                }, 2000);
+            } else {
+                showNotification('error', 'Failed to delete book.');
+            }
+        } catch (error) {
+            showNotification('error', 'Failed to delete book.');
+            console.error('Delete error:', error);
+        }
+    };
       
     const updateImage = async () => {
         if (!imageFile) {
@@ -127,7 +144,6 @@ const IndividualBook: React.FC<IndividualBookProps> = ({ params }) => {
             const newImageUrl = await updateBookPhoto(params.id, imageFile);
             if (newImageUrl) {
                 showNotification('success', 'Image updated successfully!');
-                // window.location.reload();
                 setBook(prevBook => {
                     window.location.reload();
                     if (prevBook === null) return null;
@@ -268,7 +284,7 @@ const IndividualBook: React.FC<IndividualBookProps> = ({ params }) => {
                                             <textarea
                                                 id="description"
                                                 name="description"
-                                                className="col-span-3 h-32 p-2 border rounded-md" // Set height, padding, border, and rounding as needed
+                                                className="col-span-3 h-32 p-2 border rounded-md" 
                                                 value={editableBook?.description}
                                                 onChange={handleInputChange}
                                             />
@@ -285,7 +301,7 @@ const IndividualBook: React.FC<IndividualBookProps> = ({ params }) => {
                                 </DialogContent>
                             </Dialog>
                             <button className="bg-red-500 text-white px-4 py-2 rounded"
-                            onClick={() => deleteBook(params.id).then(() => window.location.replace('/books'))}
+                            onClick={() => handleDeleteBook()}
                             >Delete</button>
                             </div>) : null}
                         </div>

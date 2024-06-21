@@ -16,9 +16,10 @@ export interface CommentText {
 
 interface CommentsSectionProps {
     postId: string;
+    isAuth: boolean;
 }
 
-const CommentsSection: React.FC<CommentsSectionProps> = ({ postId }) => {
+const CommentsSection: React.FC<CommentsSectionProps> = ({ postId , isAuth}) => {
     const [comments, setComments] = useState<Comments[]>([]);
     const [newComment, setNewComment] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(true);
@@ -67,12 +68,16 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ postId }) => {
                 </div>
             ))}
             {loading && <p>Loading comments...</p>}
-            <Textarea
-                value={newComment}
-                onChange={handleNewCommentChange}
-                placeholder="Write a comment..."
-            />
-            <Button className = "mt-6"onClick={handleCommentSubmit}>Post Comment</Button>
+            {isAuth && (
+                <div>
+                    <Textarea
+                        placeholder="Write a comment..."
+                        value={newComment}
+                        onChange={handleNewCommentChange}
+                    />
+                    <Button onClick={handleCommentSubmit}>Submit</Button>
+                </div>
+            )}
         </div>
     );
 };

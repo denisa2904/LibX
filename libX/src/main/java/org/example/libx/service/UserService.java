@@ -140,4 +140,8 @@ public class UserService {
         }
         return 0;
     }
+
+    public String getRentDate(UUID userId, UUID bookId){
+        return userRepo.findRentedOnDateByUserIdAndBookId(userId, bookId).toString();
+    }
 }

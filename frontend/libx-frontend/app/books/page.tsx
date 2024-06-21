@@ -7,7 +7,7 @@ import styles from './books.module.css';
 import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
 import { addBook } from '@/api/admin';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/api/auth';
 import { Input } from "@/components/ui/input"
@@ -15,6 +15,9 @@ import { Label } from "@/components/ui/label"
 import { Genre } from '@/api/get-individual-book';
 import { Book } from '@/api/get-individual-book';
 import { useSearchParams } from 'next/navigation';
+import { notification } from 'antd';
+import type { ArgsProps } from 'antd/lib/notification';
+import { NotificationPlacement } from 'antd/lib/notification/interface';
 
 export interface Book_with_no_id {
     title: string;
@@ -45,6 +48,16 @@ const BooksComponent: React.FC = () => {
 });
   const { role } = useAuth();
   const searchParams = useSearchParams();
+  type NotificationType = 'success' | 'info' | 'warning' | 'error';
+    const showNotification = (type:NotificationType , message:string, placement: NotificationPlacement = 'topRight') => {
+        const displayTitle = type.charAt(0).toUpperCase() + type.slice(1);
+        const config: ArgsProps = {
+            message: displayTitle,
+            description: message,
+            placement,
+        };
+        notification[type](config);
+      };
 
   useEffect(() => {
     const query = searchParams.get('q');
@@ -55,8 +68,7 @@ const BooksComponent: React.FC = () => {
         const fetchedBooks = query ? await searchBooks(query) : await getBooks();
         setBooks(fetchedBooks);
       } catch (error) {
-        console.error('Failed to fetch books:', error);
-        setError('Failed to fetch books');
+        showNotification('error', 'Failed to fetch books');
       } finally {
         setLoading(false);
       }
@@ -88,10 +100,9 @@ const BooksComponent: React.FC = () => {
 const handleAddBook = async () => {
   console.log(newBook);
     if (await addBook(newBook)) {
-        alert("Book added successfully!");
-        window.location.reload();
+        showNotification('success', 'Book added successfully');
     } else {
-        alert("Failed to add the book.");
+        showNotification('error', 'Failed to add book');
     }
 };
 
@@ -179,7 +190,9 @@ const handleAddBook = async () => {
                                         </div>
                                     </div>
                                     <DialogFooter>
-                                    <Button onClick={handleAddBook}>Save Changes</Button>
+                                      <DialogClose asChild>
+                                        <Button onClick={handleAddBook}>Save Changes</Button>
+                                       </DialogClose>
                                     </DialogFooter>
                                 </DialogContent>
                             </Dialog>

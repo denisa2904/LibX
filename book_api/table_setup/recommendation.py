@@ -71,10 +71,7 @@ def main():
     setup_database(conn)
     recs = get_recommendations(conn)
     insert_recommendation(conn, recs)
-    recs = check_recommendation_table(conn)
     conn.close()
-    print("Recommendations:")
-    print(recs)
 
 
 if __name__ == '__main__':

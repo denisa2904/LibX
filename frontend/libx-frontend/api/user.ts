@@ -72,16 +72,16 @@ export const getRentals = async (): Promise<Book[]> => {
     }
 }
 
-export const isRented = async (bookId : string) => {
+export const isRented = async (bookId : string): Promise<String> => {
     const response = await fetch(`${API_URL}/rented/${bookId}`, {
         method: 'GET',
         credentials: 'include'
     });
 
     if (response.ok) {
-        return true;
+        return await response.text();
     } else {
-        return false;
+        return 'false';
     }
 }
 
@@ -137,6 +137,7 @@ export const removeFavourite = async (bookId : string) => {
 }
 
 export const isFavourite = async (bookId : string) => {
+    try{
     const response = await fetch(`${API_URL}/favorites/${bookId}`, {
         method: 'GET',
         credentials: 'include'
@@ -146,6 +147,9 @@ export const isFavourite = async (bookId : string) => {
         return true;
     } else {
         return false;
+    }
+    } catch (error) {
+    return false;
     }
 }
 

@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from '@/app/ui/button';
 import CommentsSection from '@/app/ui/books/comments';
+import { set } from 'react-hook-form';
 
 interface BookPageProps {
     params: { id: string };
@@ -39,6 +40,7 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
     const{ isAuthenticated } = useAuth();
     const [isRentedBook, setIsRentedBook] = useState<boolean>(false);
     const [userRating, setUserRating] = useState<number>(0);
+    const [rentDate, setRentDate] = useState<String>('');
     
     useEffect(() => {
         const loadData = async () => {
@@ -58,7 +60,13 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
         const checkRentedStatus = async () => {
             if (book) {
                 const status = await isRented(book.id);
-                setIsRentedBook(status);
+                if (status === 'false') {
+                    setIsRentedBook(false);
+                }
+                else {
+                    setIsRentedBook(true);
+                    setRentDate(status);
+                }
             }
         };
 
@@ -148,6 +156,11 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
                             <span>{isRentedBook ? 'Return' : 'Rent'}</span>
                         </Button>
                     ) : null}
+                    {isRentedBook ? (
+                        <div className={styles.text_detail}>
+                        <span className='ml-3'> You have rented this book on: {rentDate}</span>
+                    </div>
+                    ) : null}
             </div>
             <div className="mt-6">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-2">Similar books:</h2>
@@ -207,7 +220,7 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
             </div>) : null}
             <div className=" mt-6 p-6 rounded-lg shadow-lg">
                 <h2 className="text-2xl font-semibold text-gray-800 mb-2 ">Comments:</h2>
-                <CommentsSection postId={book.id} />
+                <CommentsSection postId={book.id} isAuth={isAuthenticated} />
             </div>
         </>
     );

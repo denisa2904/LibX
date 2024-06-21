@@ -50,7 +50,7 @@ public class Book {
     @Column(name = "previews")
     private String previews;
 
-    @OneToOne(mappedBy = "book", cascade = CascadeType.REMOVE)
+    @OneToOne(mappedBy = "book", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private Image image;
 
     @ManyToMany(fetch = FetchType.LAZY)
