@@ -21,7 +21,6 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from '@/app/ui/button';
 import CommentsSection from '@/app/ui/books/comments';
-import { set } from 'react-hook-form';
 
 interface BookPageProps {
     params: { id: string };
@@ -40,7 +39,7 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
     const{ isAuthenticated } = useAuth();
     const [isRentedBook, setIsRentedBook] = useState<boolean>(false);
     const [userRating, setUserRating] = useState<number>(0);
-    const [rentDate, setRentDate] = useState<String>('');
+    const [rentDate, setRentDate] = useState<String>(' ');
     
     useEffect(() => {
         const loadData = async () => {
@@ -116,7 +115,8 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
                 setIsRentedBook(false);
                 console.log('Book returned successfully');
             } else {
-                await rentBook(book.id);
+                const date = await rentBook(book.id);
+                setRentDate(date);
                 setIsRentedBook(true);
                 console.log('Book rented successfully');
             }
@@ -162,7 +162,7 @@ const BookPage: React.FC<BookPageProps> = ({ params }) => {
                     </div>
                     ) : null}
             </div>
-            <div className="mt-6">
+            <div className={"mt-6"+styles.recContainer}>
                 <h2 className="text-2xl font-semibold text-gray-800 mb-2">Similar books:</h2>
                 <Carousel className={styles.carouselContent}
                     plugins={[

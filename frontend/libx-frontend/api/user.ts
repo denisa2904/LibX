@@ -22,7 +22,7 @@ const handleResponse = (response: Response) => {
     return response;
 }
 
-export const rentBook = async (bookId : string) => {
+export const rentBook = async (bookId : string): Promise<String> => {
     const response = await fetch(`${API_URL}/rented`, {
         method: 'POST',
         headers: {
@@ -34,8 +34,12 @@ export const rentBook = async (bookId : string) => {
 
     if (response.ok) {
         console.log('Book rented successfully');
+        await isRented(bookId);
+        const date = isRented(bookId);
+        return date;
     } else {
         console.error('Failed to rent book');
+        return 'false';
     }
 };
 
@@ -77,10 +81,15 @@ export const isRented = async (bookId : string): Promise<String> => {
         method: 'GET',
         credentials: 'include'
     });
-
-    if (response.ok) {
-        return await response.text();
-    } else {
+    const status = await response.text();
+    if(response.status === 200) {
+        if (status != 'Book is not rented') {
+            console.log(status);
+            return status;
+        } else {
+            return 'false';
+        }
+    } else {    
         return 'false';
     }
 }
@@ -142,8 +151,8 @@ export const isFavourite = async (bookId : string) => {
         method: 'GET',
         credentials: 'include'
     });
-
-    if (response.ok) {
+    const status = await response.text();
+    if (status === 'Book is favorite') {
         return true;
     } else {
         return false;

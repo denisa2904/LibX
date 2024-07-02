@@ -82,7 +82,7 @@ public class BookService {
     }
 
     public List<Book> getBooksByAuthor(String author) {
-        return bookRepo.findAllByAuthorContaining(author);
+        return bookRepo.findAllByAuthorContainingIgnoreCase(author);
     }
 
     public Optional<Book> getBookById(UUID id) {
@@ -97,7 +97,7 @@ public class BookService {
     }
 
     public List<Book> getBooksByPublisher(String publisher) {
-        return bookRepo.findAllByPublisherContaining(publisher);
+        return bookRepo.findAllByPublisherContainingIgnoreCase(publisher);
     }
 
     public List<Book> getBooksByYear(int year) {
@@ -129,10 +129,10 @@ public class BookService {
 
     public List<Book> getBooksBySearch(String search){
         List<Book> books = new ArrayList<>();
-        books.addAll(bookRepo.findAllByTitleContaining(search));
-        books.addAll(bookRepo.findAllByAuthorContaining(search));
-        books.addAll(bookRepo.findAllByPublisherContaining(search));
-        books.addAll(bookRepo.findAllByDescriptionContaining(search));
+        books.addAll(bookRepo.findAllByTitleContainingIgnoreCase(search));
+        books.addAll(bookRepo.findAllByAuthorContainingIgnoreCase(search));
+        books.addAll(bookRepo.findAllByPublisherContainingIgnoreCase(search));
+        books.addAll(bookRepo.findAllByDescriptionContainingIgnoreCase(search));
         try {
             int year = Integer.parseInt(search);
             books.addAll(bookRepo.findAllByYear(year));
@@ -195,7 +195,6 @@ public class BookService {
     }
 
     public int updateBook(UUID id, Book book) {
-        List<Genre> genres = book.getGenres();
         Optional<Book> oldBook = bookRepo.findById(id);
         if (oldBook.isEmpty())
             return 0;
@@ -207,18 +206,6 @@ public class BookService {
         updatedBook.setYear(book.getYear());
         updatedBook.setRating(book.getRating());
         updatedBook.setDescription(book.getDescription());
-        List<Genre> managedGenres = new ArrayList<>();
-        for (Genre genre : genres) {
-            Optional<Genre> genreOptional = genreRepo.findGenreByTitle(genre.getTitle());
-            if (genreOptional.isEmpty()) {
-                genre = genreRepo.save(genre);
-            } else {
-                genre = genreOptional.get();
-            }
-            managedGenres.add(genre);
-        }
-        updatedBook.setGenres(managedGenres);
-
         bookRepo.save(updatedBook);
         return 1;
     }

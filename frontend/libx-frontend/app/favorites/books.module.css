@@ -13,11 +13,13 @@
   }
 }
 
+.genContainer{
+  width: 90vw;
+}
 .bookCard {
   position: relative;
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
   overflow: hidden;
   height: fit-content;
   width: fit-content; 
@@ -46,6 +48,7 @@
   display: block;
   width: 100%;
   height: 100%;
+  cursor: pointer;
   object-fit: cover;
   transition: opacity 0.3s ease; 
 }

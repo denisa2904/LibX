@@ -72,7 +72,18 @@ public class BookController {
 
     @GetMapping("/search")
     public Set<Book> getBooksBySearch(@RequestParam("q") String search) {
-        return new HashSet<>(bookService.getBooksBySearch(search));
+        System.out.println();
+        System.out.println();
+        System.out.println("Search: " + search);
+        System.out.println();
+        System.out.println();
+        Set<Book> bookList = new HashSet<>(bookService.getBooksBySearch(search));
+        System.out.println();
+        System.out.println();
+        System.out.println("Book List: " + bookList.size());
+        System.out.println();
+        System.out.println();
+        return bookList;
     }
 
     @GetMapping("{id}/image")

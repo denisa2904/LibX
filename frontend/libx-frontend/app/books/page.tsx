@@ -108,18 +108,18 @@ const handleAddBook = async () => {
 
   if (error) return <div>Error: {error}</div>;
   if(!loading) return (
-        <div>
+        <div className={styles.genContainer}>
         <div className={styles.bookGrid}>
             {currentBooks.map(book => (
-            <Link key={book.id} href={`/books/${book.id}`} passHref>
-            <Card style={{ cursor: 'pointer' }}>  
+            <Card >  
               <CardContent className={styles.bookCard}>
-                <div className={styles.bookOverlay}></div>
-                <BookImage bookId={book.id} className={styles.bookImage}/>
-                <div className={styles.bookName}>{book.title}</div>
+                  <Link key={book.id} href={`/books/${book.id}`} passHref>
+                    <div className={styles.bookOverlay}></div>
+                       <BookImage bookId={book.id} className={styles.bookImage} />
+                    <div className={styles.bookName}>{book.title}</div>
+                  </Link>
               </CardContent>
             </Card>
-          </Link>
             ))}
         </div>
         {role === 'ADMIN' ? (<div className="ml-6 flex items-center  pb-3">

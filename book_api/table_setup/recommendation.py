@@ -48,7 +48,7 @@ def get_recommendations(conn):
     cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
     recommendations = []
     for idx, row in data.iterrows():
-        similar_indices = cosine_sim[idx].argsort()[:-12:-1]
+        similar_indices = cosine_sim[idx].argsort()[:-11:-1]
         similar_books = [(data['book_id'][i], cosine_sim[idx][i]) for i in similar_indices]
         recommendations.extend([(row['book_id'], book[0]) for book in similar_books if book[0] != row['book_id']])
     return recommendations

@@ -143,9 +143,14 @@ public class UserController {
         Book book = bookMaybe.get();
         if (user.getRentedBooks().contains(book)){
             String rentedOn = userService.getRentDate(user.getId(), bookId);
+            System.out.println();
+            System.out.println();
+            System.out.println(rentedOn);
+            System.out.println();
+            System.out.println();
             return ResponseEntity.status(OK).body(rentedOn);
         }
-        return ResponseEntity.status(NOT_FOUND).body("Rented book not found");
+        return ResponseEntity.status(OK).body("Book is not rented");
     }
 
     @GetMapping(path = "/favorites")
@@ -167,8 +172,8 @@ public class UserController {
             return ResponseEntity.status(NOT_FOUND).body("Book not found");
         Book book = bookMaybe.get();
         if (user.getFavorites().contains(book))
-            return ResponseEntity.status(OK).body(book);
-        return ResponseEntity.status(NOT_FOUND).body("Favorite not found");
+            return ResponseEntity.status(OK).body("Book is favorite");
+        return ResponseEntity.status(OK).body("Book is not a favorite");
     }
 
 

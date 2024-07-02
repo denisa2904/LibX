@@ -125,7 +125,7 @@ const IndividualBook: React.FC<IndividualBookProps> = ({ params }) => {
                 showNotification('success', 'Book deleted successfully!');
                 setTimeout(() => {
                     window.location.href = '/books';
-                }, 2000);
+                }, 500);
             } else {
                 showNotification('error', 'Failed to delete book.');
             }
@@ -198,7 +198,7 @@ const IndividualBook: React.FC<IndividualBookProps> = ({ params }) => {
     
 
     return (
-        <div className="p-6 rounded-lg shadow-lg">
+        <div className={styles.bContainer}>
             <div className="flex flex-col md:flex-row gap-6">
                 <div className="flex justify-center items-center">
                     <BookImage bookId={params.id} onUpdate={handleImageChange} className="w-full h-full object-cover rounded-md" />

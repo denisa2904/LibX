@@ -18,12 +18,11 @@ public interface BookRepo extends JpaRepository<Book, UUID>{
     List<Book> findAllByPublisher(String publisher);
     List<Book> findAllByYear(int year);
 
-    List<Book> findAllByTitleContaining(String title);
-    List<Book> findAllByAuthorContaining(String author);
+    List<Book> findAllByTitleContainingIgnoreCase(String title);
+    List<Book> findAllByAuthorContainingIgnoreCase(String author);
     List<Book> findAllByGenres(List<Genre> genres);
-    List<Book> findAllByRating(float rating);
-    List<Book> findAllByPublisherContaining(String publisher);
-    List<Book> findAllByDescriptionContaining(String description);
+    List<Book> findAllByPublisherContainingIgnoreCase(String publisher);
+    List<Book> findAllByDescriptionContainingIgnoreCase(String description);
 
     List<Book> findAllByRatingGreaterThanEqual(float rating);
 

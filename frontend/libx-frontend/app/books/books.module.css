@@ -18,9 +18,22 @@
   transition: background-color 0.3s ease; 
 }
 .carouselContent {
+  width: 80vw;
   overflow: hidden;
   position: relative;
   align-items: center;
+  box-sizing: border-box;
+}
+
+.genContainer{
+  width: 80vw;
+}
+
+.bContainer{
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 80vw;
 }
 
 @media (min-width: 640px) {
@@ -122,6 +135,7 @@
 .carouselItem {
   flex: 0 0 calc(33.33% - 1rem); 
   margin-right: 1rem; 
+  box-sizing: border-box;
 }
 .pl-2 {
   padding-left: 8px; 
@@ -170,10 +184,12 @@
   display: flex;
   justify-content: center; 
   padding: 10px 0; 
+  /* width: 100vw; */
 }
 
 .searchInput {
   width: 60%;
+  justify-content: center; 
   padding: 8px 20px; 
   border-radius: 25px; 
   border: 1px solid #ccc;

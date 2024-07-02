@@ -43,15 +43,15 @@ const BooksComponent: React.FC = () => {
         <div>
         <div className={styles.bookGrid}>
             {currentBooks.map(book => (
-            <Link key={book.id} href={`/books/${book.id}`} passHref>
-            <Card style={{ cursor: 'pointer' }}>  
-              <CardContent className={styles.bookCard}>
-                <div className={styles.bookOverlay}></div>
-                <BookImage bookId={book.id} className={styles.bookImage}/>
-                <div className={styles.bookName}>{book.title}</div>
-              </CardContent>
-            </Card>
-          </Link>
+            <Card >  
+            <CardContent className={styles.bookCard}>
+                <Link key={book.id} href={`/books/${book.id}`} passHref>
+                  <div className={styles.bookOverlay}></div>
+                     <BookImage bookId={book.id} className={styles.bookImage} />
+                  <div className={styles.bookName}>{book.title}</div>
+                </Link>
+            </CardContent>
+          </Card>
             ))}
         </div>
         <div className={styles.paginationWrapper}>

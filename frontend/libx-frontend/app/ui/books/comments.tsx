@@ -1,8 +1,10 @@
 'use client';
 import React, { useState, useEffect, ChangeEvent } from 'react';
-import { Button} from '@/components/ui/button'; // Ensure this import path is correct
-import { Textarea } from '@/components/ui/textarea'; // Ensure this import path is correct
+import { Button } from '@/components/ui/button'; // Ensure this import path is correct
+import { Textarea } from '@/components/ui/textarea'; // Ensure correct import paths
 import { getComments, addComment } from '@/api/get-individual-book'; // Ensure correct import paths
+import { getUser } from '@/api/user';
+import { set } from 'react-hook-form';
 
 export interface Comments {
     content: string;
@@ -19,10 +21,11 @@ interface CommentsSectionProps {
     isAuth: boolean;
 }
 
-const CommentsSection: React.FC<CommentsSectionProps> = ({ postId , isAuth}) => {
+const CommentsSection: React.FC<CommentsSectionProps> = ({ postId, isAuth }) => {
     const [comments, setComments] = useState<Comments[]>([]);
     const [newComment, setNewComment] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(true);
+    const [username, setUsername] = useState<string>("");
 
     useEffect(() => {
         const fetchInitialComments = async () => {
@@ -44,6 +47,16 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ postId , isAuth}) => 
         fetchInitialComments();
     }, [postId]);
 
+    useEffect(() => {
+        getUser().then((data) => {
+            if (!data) {
+                return;
+            }
+            setUsername(data.username);
+        });
+        
+    }, []);
+
     const handleNewCommentChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
         setNewComment(event.target.value);
     };
@@ -51,8 +64,16 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ postId , isAuth}) => 
     const handleCommentSubmit = async () => {
         if (newComment.trim()) {
             try {
-                await addComment(postId, { content: newComment });
-                window.location.reload(); 
+                const addedComment = await addComment(postId, { content: newComment });
+                setComments((prevComments) => [
+                    ...prevComments,
+                    {
+                        content: newComment,
+                        username: username, 
+                        createdAt: new Date().toISOString().split('T')[0],
+                    },
+                ]);
+                setNewComment("");
             } catch (error) {
                 console.error('Error submitting comment:', error);
             }
@@ -70,11 +91,13 @@ const CommentsSection: React.FC<CommentsSectionProps> = ({ postId , isAuth}) => 
             {loading && <p>Loading comments...</p>}
             {isAuth && (
                 <div>
+                    <div style={{ height: '10px' }} />
                     <Textarea
                         placeholder="Write a comment..."
                         value={newComment}
                         onChange={handleNewCommentChange}
                     />
+                    <div style={{ height: '10px' }} />
                     <Button onClick={handleCommentSubmit}>Submit</Button>
                 </div>
             )}

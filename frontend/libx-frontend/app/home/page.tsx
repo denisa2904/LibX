@@ -1,10 +1,11 @@
 'use client';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import Image from 'next/image';
 import styles from './home.module.css';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
 import Link from 'next/link';
+import { useAuth } from '@/api/auth';
 
 interface Genre {
   id: number;
@@ -51,6 +52,20 @@ export default function HomePage() {
     }
      
   ];
+  const isAuth = useAuth().isAuthenticated;
+  const [profileLink, setProfileLink] = useState('');
+
+  useEffect(() => {
+    if (isAuth === false) {
+      setProfileLink('/login');
+    } else {
+      setProfileLink('/profile');
+    }
+  }, [isAuth]);
+
+  console.log(profileLink);
+  console.log(isAuth);
+
 
   return (
     <div className={styles.backgroundContainer}>
@@ -65,12 +80,22 @@ export default function HomePage() {
             <p>Browse and manage your book collection.</p>
           </div>
             </Link>
-            <Link href="/profile" passHref>
-          <div className={`p-4 bg-primary text-white shadow-lg hover:shadow-xl rounded-lg cursor-pointer`}>
-            <h2 className="text-xl md:text-2xl font-semibold">Profile</h2>
-            <p>View and edit your profile information or log in.</p>
-          </div>
-            </Link>
+            {(profileLink=='/profile') ? (
+                <Link href={profileLink} passHref>
+                <div className={`p-4 bg-primary text-white shadow-lg hover:shadow-xl rounded-lg cursor-pointer`}>
+                    <h2 className="text-xl md:text-2xl font-semibold">Profile</h2>
+                    <p>View and manage your profile.</p>
+                </div>
+                </Link>
+               ) : (
+                <Link href={profileLink} passHref>
+                <div className={`p-4 bg-primary text-white shadow-lg hover:shadow-xl rounded-lg cursor-pointer`}>
+                    <h2 className="text-xl md:text-2xl font-semibold">Log In</h2>
+                    <p>Log in or create an account.</p>
+                </div>
+                </Link>
+               )
+            }
         </div>
         <div className="h-8"></div>
         <h2 className="text-xl md:text-2xl font-semibold mt-8 md:mt-16">Genres</h2>
