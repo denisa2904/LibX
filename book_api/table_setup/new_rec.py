@@ -75,11 +75,12 @@ def get_recommendations(data, read_history_data):
     data = data.fillna(0)
     R = data.values
     user_ratings_mean = np.mean(R, axis=1)
-    R_demeaned = R - user_ratings_mean.reshape(-1, 1)
+    vertical_user_ratings_mean = user_ratings_mean.reshape(-1, 1)
+    R_demeaned = R - vertical_user_ratings_mean
 
-    U, sigma, Vt = svds(R_demeaned, k=7)
+    U, sigma, Vt = svds(R_demeaned, k=3)
     sigma = np.diag(sigma)
-    all_user_predicted_ratings = np.dot(np.dot(U, sigma), Vt) + user_ratings_mean.reshape(-1, 1)
+    all_user_predicted_ratings = np.dot(np.dot(U, sigma), Vt) + vertical_user_ratings_mean
     preds = pd.DataFrame(all_user_predicted_ratings, columns=data.columns, index=data.index)
 
     read_history = pd.DataFrame(read_history_data, columns=['user_id', 'book_id'])
@@ -88,15 +89,18 @@ def get_recommendations(data, read_history_data):
     recommendations = []
     for user_id, row in preds.iterrows():
         user_read_books = set(read_history[read_history['user_id'] == user_id]['book_id'])
-        similar_indices = row.argsort()[:-12:-1]
-        similar_books = [(data.columns[i], row.iloc[i]) for i in similar_indices if
-                         data.columns[i] not in user_read_books]
-        recommendations.extend([(user_id, book[0]) for book in similar_books if book[0] != user_id])
+        filtered_books = [(data.columns[i], row.iloc[i]) for i in range(len(row)) if
+                          data.columns[i] not in user_read_books]
+        filtered_books.sort(key=lambda x: x[1], reverse=True)
+        similar_books = filtered_books[:10]
+        recommendations.extend([(user_id, book[0]) for book in similar_books])
+
     return recommendations
 
 
 def setup_database(conn):
     create_table_query = """
+    DROP TABLE IF EXISTS user_recommendations;
     CREATE TABLE IF NOT EXISTS user_recommendations (
         user_id UUID,
         book_id UUID,
@@ -115,18 +119,29 @@ def store_recommendations(conn, recommendations):
             cursor.execute(insert_query, (str(user_id), str(book_id)))
         conn.commit()
 
+def check_recommendation_table(conn):
+    with conn.cursor() as crs:
+        crs.execute("""
+            SELECT u.username, b.title
+            FROM user_recommendations ur
+            JOIN public.book b on b.id = ur.book_id
+            JOIN public.users u on u.id = ur.user_id
+        """)
+        recs = crs.fetchall()
+    return recs
 
 def main():
     conn = connect_to_db()
-    # setup_database(conn)
+    setup_database(conn)
     interaction_data, read_history_data, similarity_data = fetch_data(conn)
     data_matrix = create_matrix(interaction_data, similarity_data)
     recs = get_recommendations(data_matrix, read_history_data)
     store_recommendations(conn, recs)
+    recs = check_recommendation_table(conn)
     conn.close()
-    # print("Recommendations:")
-    # for rec in recs:
-    #     print(rec)
+    print("Recommendations:")
+    for rec in recs:
+        print(rec)
 
 
 if __name__ == '__main__':

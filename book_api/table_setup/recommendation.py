@@ -35,7 +35,6 @@ def get_all_books(conn):
 
 
 def text_processing(data):
-    data = pd.DataFrame(data)
     tfidf = TfidfVectorizer(stop_words='english')
     tfidf_matrix = tfidf.fit_transform(data['description'])
     return tfidf_matrix
